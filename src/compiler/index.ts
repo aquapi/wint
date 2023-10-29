@@ -15,7 +15,7 @@ export default <T>(tree: Tree<Store<T>>, contextName: string = 'ctx', substrStra
     };
 
     return {
-        content: `${method}=${contextName}.method;${compileNode(
+        content: `var ${method}=${contextName}.method;${compileNode(
             tree.root, ctx,
             contextName + '._pathStart', false
         )}return null;`,

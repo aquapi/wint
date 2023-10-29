@@ -11,7 +11,7 @@ export default <T>(
 
     // Optimization: Inline into the condition
     if (keys.length === 1)
-        return `if(${res === null ? '' : res + '&&'}${ctx.methodName}==='${keys[0]}')`
+        return `if(${res === null ? '' : res})if(${ctx.methodName}==='${keys[0]}')`
             + (noPreRet ? '' : '{' + preReturn + ';')
             + `return ${insertStore(ctx, store[keys[0]])}`
             + (noPreRet ? ';' : '}');

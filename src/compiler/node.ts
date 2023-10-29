@@ -3,6 +3,7 @@ import plus from './utils/plus';
 import type { BuildContext, Handler, Store } from '../types';
 import methodCheck from './utils/methodCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
+import createIf from './utils/createIf';
 
 export default function f<T>(
     node: Node<Store<T>>,
@@ -18,13 +19,9 @@ export default function f<T>(
             node.part.length - 1
         ),
         // No handling for root
-        result = isRoot ? '' : (
-            // Wrap in an if statement
-            `if(${ctx.urlName}.` + (node.part.length === 2
-                ? `charCodeAt(${prevPathLen})===${node.part.charCodeAt(1)}`
-                : `${ctx.substrStrategy}(${prevPathLen},${pathLen})==='${node.part.substring(1)}'`
-            ) + '){'
-        );
+        result = isRoot ? '' : createIf(
+            ctx, node, prevPathLen, pathLen
+        ) + '{';
 
     // Normal handler
     if (node.store !== null)

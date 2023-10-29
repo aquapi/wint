@@ -13,16 +13,13 @@ const wint = Wint.create([
     ['/json', { POST: f3 }]
 ]).build(), memo = new Memoirist;
 
+console.log(wint.find.toString())
+
 memo.add('GET', '/', f1);
 memo.add('GET', '/id/:id', f2);
-memo.add('POST', '/json/and/a/long/path', f3);
+memo.add('POST', '/json', f3);
 
 // Avoid JIT bias
-bench('noop', () => { });
-bench('noop', () => { });
-bench('noop', () => { });
-bench('noop', () => { });
-bench('noop', () => { });
 bench('noop', () => { });
 bench('noop', () => { });
 bench('noop', () => { });
@@ -75,13 +72,13 @@ group('GET /id/:id', () => {
     bench('Wint', () => wint.find(c));
 });
 
-group('POST /json/and/a/long/path', () => {
+group('POST /json', () => {
     const c: Context = {
         params: null,
         _pathStart: 1,
-        _pathEnd: 21,
+        _pathEnd: 5,
         method: 'POST',
-        url: '/json/and/a/long/path'
+        url: '/json'
     };
 
     bench('Memoirist', () => memo.find(c.method, c.url));

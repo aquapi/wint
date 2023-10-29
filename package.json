@@ -1,0 +1,11 @@
+{
+  "name": "wintjs",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
+  },
+  "description": "A minimal, insanely fast router for all runtimes",
+  "types": "./types/index.d.ts"
+}

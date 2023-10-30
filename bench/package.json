@@ -5,6 +5,7 @@
   "dependencies": {
     "memoirist": "^0.1.4",
     "mitata": "^0.1.6",
-    "radix3": "^1.1.0"
+    "radix3": "^1.1.0",
+    "bun-types": "latest"
   }
 }

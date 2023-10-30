@@ -57,11 +57,9 @@ export class Wint<T> {
         this.options.substr ??= 'substring';
         this.options.staticHandlersName ??= '_h';
 
-        const hasStaticMap = !!this.options.staticMap;
-
         // Add all to the tree and compile
         let route: Route<T>;
-        if (hasStaticMap)
+        if (this.options.staticMap)
             for (route of this.record) {
                 if (route[0].includes(':') || route[0].includes('*'))
                     this.tree.store(route[0], route[1]);
@@ -75,6 +73,7 @@ export class Wint<T> {
             this.tree, this.options
         ), keys = [], values = [];
 
+        // Add to the function scope
         for (var key in c.meta.paramsMap) {
             keys.push(key);
             values.push(c.meta.paramsMap[key]);

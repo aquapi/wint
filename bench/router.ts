@@ -20,8 +20,8 @@ const wint = Wint.create([
     [path3, { POST: f3 }]
 ]);
 
-// Enable static map
-wint.options.staticMap = {};
+// Enable static map 
+// wint.options.staticMap = {};
 wint.build();
 
 console.log(wint.find.toString());
@@ -80,19 +80,19 @@ noop(bench);
 benchCtx({
     params: null,
     method: 'GET',
-    path: path1
+    url: path1
 });
 
 benchCtx({
     params: null,
     method: 'GET',
-    path: path2Test
+    url: path2Test
 });
 
 benchCtx({
     params: null,
     method: 'POST',
-    path: path3
+    url: path3
 });
 
 run();

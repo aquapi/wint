@@ -5,12 +5,12 @@ import methodCheck from './utils/methodCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
 import createIf from './utils/createIf';
 
-export default function f<T>(
+const f = <T>(
     node: Node<Store<T>>,
     ctx: BuildContext,
     prevPathLen: string,
     isChildParam: boolean
-) {
+) => {
     // Get current pathname
     let
         isRoot = node.part.length === 1,
@@ -111,4 +111,6 @@ export default function f<T>(
     }
 
     return isRoot ? result : result + '}';
-}
+};
+
+export default f;

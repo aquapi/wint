@@ -44,7 +44,7 @@ export default <T>(
     content += compileNode(
         tree.root, ctx,
         ctx.pathStartName, false
-    ) + 'return null';
+    ) + ';return null';
 
     return {
         content,

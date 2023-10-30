@@ -17,7 +17,13 @@ export class Wint<T> {
     /**
      * Router options
      */
-    readonly options: Options = { substr: 'substring' };
+    readonly options: Options<T> = {
+        substr: 'substring',
+        cacheMethod: false,
+        contextName: 'c',
+        staticMap: null,
+        staticHandlersName: '_h'
+    };
 
     /**
      * Register routes
@@ -38,26 +44,43 @@ export class Wint<T> {
     /**
      * Inspect the output string
      */
-    inspect(ctxName: string = 'c') {
-        return compile(this.tree, ctxName, this.options.substr);
+    inspect() {
+        return compile(this.tree, this.options);
     }
 
     /**
      * Build a find function
      */
     build() {
-        for (var route of this.record)
+        // Fix missing options
+        this.options.contextName ??= 'c';
+        this.options.substr ??= 'substring';
+        this.options.staticHandlersName ??= '_h';
+
+        const hasStaticMap = !!this.options.staticMap;
+
+        // Add all to the tree and compile
+        let route: Route<T>;
+        if (hasStaticMap)
+            for (route of this.record) {
+                if (route[0].includes(':') || route[0].includes('*'))
+                    this.tree.store(route[0], route[1]);
+                else
+                    this.options.staticMap[route[0].substring(1)] = route[1];
+            }
+        else for (route of this.record)
             this.tree.store(route[0], route[1]);
 
-        const c = compile(this.tree, 'c', this.options.substr),
-            keys = [], values = [];
+        const c = compile(
+            this.tree, this.options
+        ), keys = [], values = [];
 
         for (var key in c.meta.paramsMap) {
             keys.push(key);
             values.push(c.meta.paramsMap[key]);
         }
 
-        this.find = Function(...keys, `return c=>{${c.content}}`)(...values);
+        this.find = Function(...keys, `return ${this.options.contextName}=>{${c.content}}`)(...values);
         return this;
     }
 }

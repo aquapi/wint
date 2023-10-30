@@ -1,65 +1,98 @@
 import { run, bench, group } from 'mitata';
 import Memoirist from 'memoirist';
-import { Wint, Context } from '..';
+import { Wint, Context } from '../src';
 import noop from './noop';
+import { createRouter } from 'radix3';
 
 // Main
 const f1 = { f: () => 'Hi' },
     f2 = { f: () => 'Hello' },
-    f3 = { f: () => '{}' };
+    f3 = { f: () => '{}' },
+    path1 = '/1234567/8901234567890',
+    path2 = '/id/:id',
+    path2Test = '/id/90',
+    path3 = '/json';
 
+// Wint
 const wint = Wint.create([
-    ['/12345678901234567890', { GET: f1 }],
-    ['/id/:id', { GET: f2 }],
-    ['/json', { POST: f3 }]
-]).build(), memo = new Memoirist;
+    [path1, { GET: f1 }],
+    [path2, { GET: f2 }],
+    [path3, { POST: f3 }]
+]);
 
-console.log(wint.find.toString())
+// Enable static map
+wint.options.staticMap = {};
+wint.build();
 
-memo.add('GET', '/12345678901234567890', f1);
-memo.add('GET', '/id/:id', f2);
-memo.add('POST', '/json', f3);
+console.log(wint.find.toString());
+
+// Memoirist
+const memo = new Memoirist;
+memo.add('GET', path1, f1);
+memo.add('GET', path2, f2);
+memo.add('POST', path3, f3);
+
+// Radix3
+const radix3 = createRouter({
+    routes: {
+        [path1]: { GET: f1 },
+        [path2]: { GET: f2 },
+        [path3]: { POST: f3 }
+    }
+}), radix3Lookup = (method: string, path: string) => {
+    const t = radix3.lookup(path);
+    return t === null ? null : (
+        method in t ? t[method] : null
+    );
+};
+
+function benchCtx(c: Context) {
+    const hasPath = !!c.path,
+        normalPath = hasPath ? c.path! : c.url!,
+        label = c.method + ' ' + normalPath;
+
+    // Normalize path for Wint
+    if (hasPath)
+        c.path = c.path!.substring(1);
+    else {
+        c._pathStart = 1;
+        c._pathEnd = c.url!.length
+    }
+
+    // Print search result before running tests
+    console.log('----', label, '----');
+    console.log('Wint:', wint.find(c));
+    console.log('Memoirist:', memo.find(c.method, normalPath));
+    console.log('Radix3:', radix3Lookup(c.method, normalPath));
+    console.log();
+
+    // Main bench
+    group(label, () => {
+        bench('Radix3', () => radix3Lookup(c.method, normalPath));
+        bench('Memoirist', () => memo.find(c.method, normalPath));
+        bench('Wint', () => wint.find(c));
+    });
+}
 
 // Avoid JIT bias
 noop(bench);
 
-group('GET /', () => {
-    const c: Context = {
-        params: null,
-        _pathStart: 1,
-        _pathEnd: 20,
-        method: 'GET',
-        url: '/12345678901234567890'
-    };
-
-    bench('Memoirist', () => memo.find(c.method, c.url));
-    bench('Wint', () => wint.find(c));
+benchCtx({
+    params: null,
+    method: 'GET',
+    path: path1
 });
 
-group('GET /id/:id', () => {
-    const c: Context = {
-        params: null,
-        _pathStart: 1,
-        _pathEnd: 6,
-        method: 'GET',
-        url: '/id/90'
-    };
-
-    bench('Memoirist', () => memo.find(c.method, c.url));
-    bench('Wint', () => wint.find(c));
+benchCtx({
+    params: null,
+    method: 'GET',
+    path: path2Test
 });
 
-group('POST /json', () => {
-    const c: Context = {
-        params: null,
-        _pathStart: 1,
-        _pathEnd: 5,
-        method: 'POST',
-        url: '/json'
-    };
-
-    bench('Memoirist', () => memo.find(c.method, c.url));
-    bench('Wint', () => wint.find(c));
+benchCtx({
+    params: null,
+    method: 'POST',
+    path: path3
 });
 
 run();

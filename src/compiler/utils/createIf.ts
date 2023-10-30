@@ -1,9 +1,9 @@
 import { Node } from "../../tree";
-import { BuildContext, Handler, Store } from "../../types";
+import { BuildContext, Store } from "../../types";
 import plus from "./plus";
 
 export default <T>(
-    ctx: BuildContext<Handler<T>>,
+    ctx: BuildContext,
     node: Node<Store<T>>,
     prevPathLen: string, pathLen: string
 ) => {

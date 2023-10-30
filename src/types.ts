@@ -10,22 +10,27 @@ export interface Context {
     /**
      * The request URL 
      */
-    url: string;
+    url?: string;
+
+    /**
+     * The request path without first `/`
+     */
+    path?: string;
 
     /**
      * The pathname start index without first `/` 
      */
-    _pathStart: number;
+    _pathStart?: number;
 
     /**
      * Pathname end (index of '?' or the end of the URL)
      */
-    _pathEnd: number;
+    _pathEnd?: number;
 
     /**
      * The URL parameters
      */
-    params: any;
+    params?: any;
 }
 
 /**
@@ -43,11 +48,11 @@ export interface Handler<T> {
 /**
  * The object for passing between recursive calls
  */
-export interface BuildContext<T> {
+export interface BuildContext {
     /**
      * All store map
      */
-    paramsMap: Record<string, T>;
+    paramsMap: Record<string, any>;
 
     /**
      * Variable name of the context object
@@ -65,9 +70,19 @@ export interface BuildContext<T> {
     pathEndName: string;
 
     /**
+     * The name of the path start variable
+     */
+    pathStartName: string;
+
+    /**
      * The name of the params variable
      */
     paramsName: string;
+
+    /**
+     * The name of the static handlers store
+     */
+    staticHandlersName: string;
 
     /**
      * The name of the url variable
@@ -93,9 +108,18 @@ export type SubstrStrategy = 'substr' | 'substring' | 'slice';
 /**
  * Router option
  */
-export interface Options {
+export interface Options<T> {
     substr?: SubstrStrategy;
+    cacheMethod?: boolean;
+    contextName?: string;
+    staticMap?: StaticMap<T>;
+    staticHandlersName?: string;
 }
+
+/**
+ * Static handlers map
+ */
+export interface StaticMap<T> extends Record<string, Store<T>> { };
 
 /**
  * Represent a handler

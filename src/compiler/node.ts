@@ -1,13 +1,13 @@
 import type { Node } from '../tree';
 import plus from './utils/plus';
-import type { BuildContext, Handler, Store } from '../types';
+import type { BuildContext, Store } from '../types';
 import methodCheck from './utils/methodCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
 import createIf from './utils/createIf';
 
 export default function f<T>(
     node: Node<Store<T>>,
-    ctx: BuildContext<Handler<T>>,
+    ctx: BuildContext,
     prevPathLen: string,
     isChildParam: boolean
 ) {

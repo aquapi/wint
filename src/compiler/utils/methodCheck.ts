@@ -1,10 +1,10 @@
-import { BuildContext, Handler, Store } from '../../types';
+import { BuildContext, Store } from '../../types';
 import insertStore from './insertStore';
 
 export default <T>(
     // res is the condition
     res: string | null, store: Store<T>,
-    ctx: BuildContext<Handler<T>>,
+    ctx: BuildContext,
     preReturn: string | null,
 ) => {
     const keys = Object.keys(store), noPreRet = preReturn === null;

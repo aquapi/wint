@@ -1,27 +1,3 @@
-export default function noop(bench: any) {
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
-    bench('noop', () => { });
+export default (bench: any, t: number = 20) => {
+    while (t-- > 0) bench('noop', () => { });
 }

@@ -1,15 +1,16 @@
 import type { Node } from '../tree';
 import plus from './utils/plus';
-import type { BuildContext, Store } from '../types';
+import type { BuildContext } from '../types';
 import methodCheck from './utils/methodCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
 import createIf from './utils/createIf';
 
 const f = <T>(
-    node: Node<Store<T>>,
+    node: Node<T>,
     ctx: BuildContext,
     prevPathLen: string,
-    isChildParam: boolean
+    isChildParam: boolean,
+    isNestedChildParam: boolean
 ) => {
     // Get current pathname
     let
@@ -37,7 +38,7 @@ const f = <T>(
         if (node.inert.size === 1)
             result += `if(${ctx.urlName}.charCodeAt(${pathLen})===${it.value})` + f(
                 node.inert.get(it.value)!, ctx,
-                plus(pathLen, 1), isChildParam
+                plus(pathLen, 1), isChildParam, isNestedChildParam
             );
 
         // Create a switch
@@ -47,7 +48,7 @@ const f = <T>(
             do {
                 result += `case ${it.value}:` + f(
                     node.inert.get(it.value)!, ctx,
-                    plus(pathLen, 1), isChildParam
+                    plus(pathLen, 1), isChildParam, isNestedChildParam
                 ) + 'break;';
 
                 it = keys.next();
@@ -58,23 +59,26 @@ const f = <T>(
     }
 
     if (node.params !== null) {
-        // Declare previous param index
-        result += (isChildParam ? '' : 'var ')
-            + `${prevParamIndexName}=${pathLen};`;
+        const prevIndex = isChildParam ? prevParamIndexName : pathLen;
 
-        const nextSlashIndex = `${ctx.urlName}.indexOf('/',${prevParamIndexName})`,
+        // Declare previous param index
+        if (isChildParam)
+            result += (isNestedChildParam ? '' : 'let ')
+                + `${prevParamIndexName}=${pathLen};`;
+
+        const nextSlashIndex = `${ctx.urlName}.indexOf('/',${prevIndex})`,
             hasInert = node.params.inert !== null,
             hasStore = node.params.store !== null,
             key = node.params.paramName;
 
         // Declare the current param index variable if inert is found
         if (hasInert)
-            result += (isChildParam ? '' : 'var ')
+            result += (isChildParam ? '' : 'let ')
                 + `${currentParamIndexName}=${nextSlashIndex};`;
 
         // Slice the value if a store is found
         if (hasStore) {
-            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevParamIndexName},${ctx.pathEndName})`;
+            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevIndex},${ctx.pathEndName})`;
 
             result += methodCheck(
                 `${hasInert ? currentParamIndexName : nextSlashIndex}===-1`,
@@ -83,12 +87,12 @@ const f = <T>(
                 `${ctx.paramsName}${isChildParam
                     ? `.${key}=${value}`
                     : `={${key}:${value}}`
-                }`
+                };`
             );
         }
 
         if (hasInert) {
-            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevParamIndexName},${currentParamIndexName})`;
+            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevIndex},${currentParamIndexName})`;
 
             // Additional check if no store is provided
             result += (hasStore ? '' : `if(${currentParamIndexName}===-1)return null;`)
@@ -98,7 +102,9 @@ const f = <T>(
                 };`
                 + f(
                     node.params.inert!, ctx,
-                    plus(currentParamIndexName, 1), true
+                    plus(currentParamIndexName, 1), true,
+                    // If this is the first inert this will be false
+                    isChildParam
                 );
         }
     }

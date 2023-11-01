@@ -1,10 +1,10 @@
 import { Node } from "../../tree";
-import { BuildContext, Store } from "../../types";
+import { BuildContext, } from "../../types";
 import plus from "./plus";
 
 export default <T>(
     ctx: BuildContext,
-    node: Node<Store<T>>,
+    node: Node<T>,
     prevPathLen: string, pathLen: string
 ) => {
     // Much faster than doing substring

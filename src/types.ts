@@ -3,46 +3,24 @@
  */
 export interface Context {
     /**
-     * The request method
+     * The request URL
      */
-    method: string;
+    url: string;
 
     /**
-     * The request URL 
+     * The pathname start index
      */
-    url?: string;
+    _pathStart: number;
 
     /**
-     * The request path without first `/`
+     * Pathname end index (index of '?' or the end of the URL)
      */
-    path?: string;
-
-    /**
-     * The pathname start index without first `/` 
-     */
-    _pathStart?: number;
-
-    /**
-     * Pathname end (index of '?' or the end of the URL)
-     */
-    _pathEnd?: number;
+    _pathEnd: number;
 
     /**
      * The URL parameters
      */
     params?: any;
-}
-
-/**
- * A handler store
- */
-export interface Store<T> extends Record<string, Handler<T>> { };
-
-/**
- * A handler
- */
-export interface Handler<T> {
-    f: T;
 }
 
 /**
@@ -52,47 +30,37 @@ export interface BuildContext {
     /**
      * All store map
      */
-    paramsMap: Record<string, any>;
+    readonly paramsMap: Record<string, any>;
 
     /**
      * Variable name of the context object
      */
-    contextName: string;
-
-    /**
-     * The name of the request method variable
-     */
-    methodName: string;
+    readonly contextName: string;
 
     /**
      * The name of the path end variable
      */
-    pathEndName: string;
+    readonly pathEndName: string;
 
     /**
      * The name of the path start variable
      */
-    pathStartName: string;
+    readonly pathStartName: string;
 
     /**
      * The name of the params variable
      */
-    paramsName: string;
-
-    /**
-     * The name of the static handlers store
-     */
-    staticHandlersName: string;
+    readonly paramsName: string;
 
     /**
      * The name of the url variable
      */
-    urlName: string;
+    readonly urlName: string;
 
     /**
      * Substring strategy micro-optimization
      */
-    substrStrategy: SubstrStrategy;
+    readonly substrStrategy: SubstrStrategy;
 
     /**
      * The current ID of the store
@@ -103,25 +71,17 @@ export interface BuildContext {
 /**
  * String substr strategy
  */
-export type SubstrStrategy = 'substr' | 'substring' | 'slice';
+export type SubstrStrategy = 'substring' | 'slice';
 
 /**
  * Router option
  */
-export interface Options<T> {
+export interface Options {
     substr?: SubstrStrategy;
-    cacheMethod?: boolean;
     contextName?: string;
-    staticMap?: StaticMap<T>;
-    staticHandlersName?: string;
 }
-
-/**
- * Static handlers map
- */
-export interface StaticMap<T> extends Record<string, Store<T>> { };
 
 /**
  * Represent a handler
  */
-export type Route<T> = [path: string, store: Store<T>];
+export type Route<T> = [path: string, store: T];

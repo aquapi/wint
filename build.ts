@@ -2,7 +2,7 @@
 import { existsSync, rmSync } from 'fs';
 
 // Generating types
-const dir = './types';
+const dir = import.meta.dir + '/types';
 if (existsSync(dir))
     rmSync(dir, { recursive: true });
 
@@ -11,7 +11,7 @@ Bun.build({
     target: 'bun',
     outdir: '.',
     minify: true,
-    entrypoints: ['./src/index.ts']
+    entrypoints: [import.meta.dir + '/src/index.ts']
 });
 
 // Build type declarations

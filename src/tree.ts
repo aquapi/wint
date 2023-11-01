@@ -44,7 +44,7 @@ const
     paramsRegex = /:.+?(?=\/|$)/g;
 
 export class Tree<T> {
-    root!: Node<T>;
+    root: Node<T>;
 
     store(path: string, store: T): FindResult<T>['store'] {
         if (typeof path !== 'string')
@@ -63,12 +63,9 @@ export class Tree<T> {
 
         if (inertParts[inertParts.length - 1] === '') inertParts.pop();
 
-        let node: Node<T>;
+        if (!this.root) this.root = createNode<T>('/');
 
-        if (!this.root) node = this.root = createNode<T>('/');
-        else node = this.root;
-
-        let paramPartsIndex = 0;
+        let node = this.root, paramPartsIndex = 0;
 
         for (var i = 0; i < inertParts.length; ++i) {
             var part = inertParts[i];

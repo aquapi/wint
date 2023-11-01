@@ -1,53 +1,39 @@
 import { Options } from '../types';
 import type { Tree } from '../tree';
-import type { BuildContext, Store } from '../types';
-import { method } from './constants';
+import type { BuildContext } from '../types';
 import compileNode from './node';
 
 /**
  * Build a function body to pass into `Function` constructor later
  */
 export default <T>(
-    tree: Tree<Store<T>>,
-    options: Options<T>,
+    tree: Tree<T>,
+    options: Options,
 ) => {
-    const hasStaticMap = !!options.staticMap,
-        ctx: BuildContext = {
-            // Path start can be static if a static map is provided
-            pathStartName: hasStaticMap ? '0' : options.contextName + '._pathStart',
-            pathEndName: options.contextName + (hasStaticMap ? '.path.length' : '._pathEnd'),
+    // Fix missing options 
+    options.contextName ??= 'c';
+    options.substr ??= 'substring';
 
-            urlName: hasStaticMap ? options.contextName + '.path' : options.contextName + '.url',
-            methodName: options.cacheMethod ? method : options.contextName + '.method',
-            paramsName: options.contextName + '.params',
+    // Global context
+    const ctx: BuildContext = {
+        // Path start can be static if a static map is provided
+        pathStartName: options.contextName + '._pathStart',
+        pathEndName: options.contextName + '._pathEnd',
 
-            currentID: 0,
-            paramsMap: {},
+        urlName: options.contextName + '.url',
+        paramsName: options.contextName + '.params',
 
-            substrStrategy: options.substr,
-            staticHandlersName: options.staticHandlersName,
-            contextName: options.contextName,
-        };
+        // These props will be changed
+        currentID: 0,
+        paramsMap: {},
 
-    // Whether method cache is allowed
-    let content = options.cacheMethod ? `var ${method}=${options.contextName}.method;` : '';
-
-    // If static map is available
-    if (hasStaticMap) {
-        ctx.paramsMap[ctx.staticHandlersName] = options.staticMap;
-        content += `if(${ctx.urlName} in ${ctx.staticHandlersName})`
-            + `if(${ctx.methodName} in ${ctx.staticHandlersName}[${ctx.urlName}])`
-            + `return ${ctx.staticHandlersName}[${ctx.urlName}][${ctx.methodName}];`;
-    }
-
-    // Compile 
-    content += compileNode(
-        tree.root, ctx,
-        ctx.pathStartName, false
-    ) + ';return null';
-
-    return {
-        content,
-        meta: ctx
+        substrStrategy: options.substr,
+        contextName: options.contextName,
     };
+
+    const content = compileNode(
+        tree.root, ctx, ctx.pathStartName, false, false
+    );
+
+    return Function(...Object.keys(ctx.paramsMap), content)(...Object.values(ctx.paramsMap));
 }

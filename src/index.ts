@@ -1,55 +1,89 @@
-import compile from './compiler';
-import { Tree } from './tree';
-import type { Options, Route, Context } from './types';
+import { Radix } from './radix';
+import { MatchFunction, Route } from './radix/types';
+import { WintContext } from './types';
 
-export class Wint<T> {
-    /**
-     * The DS
-     */
-    readonly tree: Tree<T> = new Tree;
+const noop = () => null;
 
+class Wint<T> {
     /**
-     * Router options
+     * Radix tree routers for dynamic matching
      */
-    readonly options: Options = {
-        substr: 'substring',
-        contextName: 'c'
-    };
+    readonly trees: Record<string, Radix<T>> = {};
 
     /**
-     * Register routes
+     * Map by method and pathname
      */
-    routes(routes: Route<T>[]) {
-        for (var route of routes)
-            this.tree.store(route[0], route[1]);
+    readonly static: Record<string, [string, T][]> = {};
+
+    /**
+     * Build matcher for validating request
+     */
+    readonly matchers: Record<string, [Record<string, T>, MatchFunction<T>]> = {};
+
+    /**
+     * Register a route
+     */
+    put(method: string, route: Route<T>) {
+        // Parametric or wildcard
+        if (route[0].includes('*') || route[0].includes(':')) {
+            if (!(method in this.trees))
+                this.trees[method] = new Radix;
+
+            // Register the route on the corresponding tree
+            this.trees[method].put(route);
+        } else {
+            if (!(method in this.static))
+                this.static[method] = [];
+
+            // Save the path in a record object (normalize later)
+            this.static[method].push(route);
+        }
 
         return this;
     }
 
     /**
-     * Create and register routes
-     */
-    static create<T>(routes: Route<T>[]) {
-        return new Wint<T>().routes(routes);
-    }
-
-    /**
-     * Build a find function
+     * Build matchers
      */
     build() {
-        this.find = compile(this.tree, this.options);
+        const matchers = this.matchers;
+
+        // Build matchers
+        for (var method in this.static) {
+            if (!(method in matchers))
+                matchers[method] = [{}, noop];
+
+            // Assign paths
+            for (var route of this.static[method])
+                matchers[method][0][
+                    route[0].substring(1)
+                ] = route[1];
+        }
+
+        // Build handlers for trees
+        for (var method in this.trees) {
+            if (!(method in this.matchers))
+                matchers[method] = [{}, noop];
+
+            matchers[method][1] = this.trees[method].build().find;
+        }
+
+        // Build the actual function
+        this.find = c => {
+            const matcher = matchers[c.method];
+            if (matcher) {
+                const staticMatcher = matcher[0][c.path];
+                return staticMatcher ?? matcher[1](c);
+            }
+            return null;
+        }
         return this;
     }
 }
 
-export interface Wint<T> {
-    /**
-     * Find a handler based on the given context
-     */
-    find(c: Context): T;
+// Add a find function
+interface Wint<T> {
+    find(c: WintContext): T | null;
 }
 
-export * as compile from './compiler';
-export * as compileNode from './compiler/node';
-export * as constants from './compiler/constants';
-export * from './types';
+export default Wint;

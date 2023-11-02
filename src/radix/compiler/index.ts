@@ -1,6 +1,6 @@
 import { Options } from '../types';
 import type { Tree } from '../tree';
-import type { BuildContext } from '../types';
+import type { BuildContext, MatchFunction } from '../types';
 import compileNode from './node';
 
 /**
@@ -9,7 +9,7 @@ import compileNode from './node';
 export default <T>(
     tree: Tree<T>,
     options: Options,
-) => {
+): MatchFunction<T> => {
     // Fix missing options 
     options.contextName ??= 'c';
     options.substr ??= 'substring';
@@ -35,5 +35,8 @@ export default <T>(
         tree.root, ctx, ctx.pathStartName, false, false
     );
 
-    return Function(...Object.keys(ctx.paramsMap), content)(...Object.values(ctx.paramsMap));
+    return Function(
+        ...Object.keys(ctx.paramsMap),
+        `return ${ctx.contextName}=>{${content}return null}`
+    )(...Object.values(ctx.paramsMap));
 }

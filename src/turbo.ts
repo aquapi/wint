@@ -75,7 +75,6 @@ class Wint<T> {
             const matcher = matchers[c.method];
             if (matcher) {
                 const staticMatcher = matcher[0][c.path];
-                // @ts-ignore
                 return staticMatcher ?? matcher[1](c);
             }
             return null;
@@ -90,13 +89,3 @@ interface Wint<T> extends Router<T> {
 }
 
 export default Wint;
-
-const router = new Wint<() => string>()
-    .put('GET', '/', () => 'Hi')
-    .put('GET', '/id/:id', () => 'Hello')
-    .build();
-
-console.log(router.find({
-    method: 'GET',
-    path: ''
-})())

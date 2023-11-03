@@ -1,10 +1,12 @@
 import { Radix } from './radix';
 import { MatchFunction, Route } from './radix/types';
-import { Router, Context } from './types';
+import { Context, Router } from './types';
 
 const noop = () => null, matchPath = { matchPath: true };
 
 class Wint<T> {
+    private allMethods: string[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
+
     /**
      * Radix tree routers for dynamic matching
      */
@@ -24,19 +26,23 @@ class Wint<T> {
      * Register a route
      */
     put(method: string, ...route: Route<T>) {
-        // Parametric or wildcard
-        if (route[0].includes('*') || route[0].includes(':')) {
-            if (!(method in this.trees))
-                this.trees[method] = new Radix(matchPath);
+        const methods = method === 'ALL' ? this.allMethods : [method];
 
-            // Register the route on the corresponding tree
-            this.trees[method].put(route);
-        } else {
-            if (!(method in this.static))
-                this.static[method] = [];
+        for (const method of methods) {
+            // Parametric or wildcard
+            if (route[0].includes('*') || route[0].includes(':')) {
+                if (!(method in this.trees))
+                    this.trees[method] = new Radix(matchPath);
 
-            // Save the path in a record object (normalize later)
-            this.static[method].push(route);
+                // Register the route on the corresponding tree
+                this.trees[method].put(route);
+            } else {
+                if (!(method in this.static))
+                    this.static[method] = [];
+
+                // Save the path in a record object (normalize later)
+                this.static[method].push(route);
+            }
         }
 
         return this;

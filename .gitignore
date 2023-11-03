@@ -179,4 +179,5 @@ bun.lockb
 
 # Build output
 index.js
+turbo.js
 types

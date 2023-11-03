@@ -1,6 +1,6 @@
-import { Context } from './radix/types';
+import { Context as RadixContext, Route } from './radix/types';
 
-export interface WintContext extends Context {
+export interface Context extends RadixContext {
     /**
      * The request method
      */
@@ -11,3 +11,20 @@ export interface WintContext extends Context {
      */
     path: string;
 };
+
+export interface Router<T> {
+    /**
+     * Add a route handler
+     */
+    put(method: string, ...route: Route<T>): void;
+    /**
+     * Find the matching item
+     */
+    find(c: Context): T | null;
+
+    /**
+     * Build the router handler
+     */
+    build(): void;
+}
+

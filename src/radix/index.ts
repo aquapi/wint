@@ -1,6 +1,6 @@
 import compile from './compiler';
 import { Tree } from './tree';
-import type { Options, Route, Context, MatchFunction } from './types';
+import type { Context, Options, Route } from './types';
 
 export class Radix<T> {
     /**
@@ -13,7 +13,8 @@ export class Radix<T> {
      */
     readonly options: Options = {
         substr: 'substring',
-        contextName: 'c'
+        contextName: 'c',
+        matchPath: false
     };
 
     /**
@@ -52,8 +53,5 @@ export class Radix<T> {
 }
 
 export interface Radix<T> {
-    /**
-     * Find a handler based on the given context
-     */
-    find: MatchFunction<T>;
-}
+    find(c: Context): T;
+};

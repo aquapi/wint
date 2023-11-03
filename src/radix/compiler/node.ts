@@ -78,7 +78,10 @@ const f = <T>(
 
         // Slice the value if a store is found
         if (hasStore) {
-            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevIndex},${ctx.pathEndName})`;
+            const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevIndex}${
+                // Optimization for path matching instead of whole URL 
+                ctx.hasPath ? '' : ',' + ctx.pathEndName
+                })`;
 
             result += methodCheck(
                 `${hasInert ? currentParamIndexName : nextSlashIndex}===-1`,

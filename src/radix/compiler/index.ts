@@ -13,14 +13,15 @@ export default <T>(
     // Fix missing options 
     options.contextName ??= 'c';
     options.substr ??= 'substring';
+    options.matchPath ??= false;
 
     // Global context
     const ctx: BuildContext = {
         // Path start can be static if a static map is provided
-        pathStartName: options.contextName + '._pathStart',
-        pathEndName: options.contextName + '._pathEnd',
+        pathStartName: options.matchPath ? '0' : options.contextName + '._pathStart',
+        pathEndName: options.contextName + '.' + (options.matchPath ? 'path.length' : '_pathEnd'),
 
-        urlName: options.contextName + '.url',
+        urlName: options.contextName + '.' + (options.matchPath ? 'path' : 'url'),
         paramsName: options.contextName + '.params',
 
         // These props will be changed
@@ -29,10 +30,14 @@ export default <T>(
 
         substrStrategy: options.substr,
         contextName: options.contextName,
+
+        hasPath: options.matchPath
     };
 
     const content = compileNode(
-        tree.root, ctx, ctx.pathStartName, false, false
+        tree.root, ctx,
+        ctx.pathStartName,
+        false, false
     );
 
     return Function(

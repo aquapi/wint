@@ -1,6 +1,6 @@
 import { Radix } from './radix';
 import { MatchFunction, Route } from './radix/types';
-import { WintContext } from './types';
+import { Router, Context } from './types';
 
 const noop = () => null;
 
@@ -23,11 +23,13 @@ class Wint<T> {
     /**
      * Register a route
      */
-    put(method: string, route: Route<T>) {
+    put(method: string, ...route: Route<T>) {
         // Parametric or wildcard
         if (route[0].includes('*') || route[0].includes(':')) {
-            if (!(method in this.trees))
+            if (!(method in this.trees)) {
                 this.trees[method] = new Radix;
+                this.trees[method].options.matchPath = true;
+            }
 
             // Register the route on the corresponding tree
             this.trees[method].put(route);
@@ -73,6 +75,7 @@ class Wint<T> {
             const matcher = matchers[c.method];
             if (matcher) {
                 const staticMatcher = matcher[0][c.path];
+                // @ts-ignore
                 return staticMatcher ?? matcher[1](c);
             }
             return null;
@@ -82,8 +85,18 @@ class Wint<T> {
 }
 
 // Add a find function
-interface Wint<T> {
-    find(c: WintContext): T | null;
+interface Wint<T> extends Router<T> {
+    find(c: Context): T | null;
 }
 
 export default Wint;
+
+const router = new Wint<() => string>()
+    .put('GET', '/', () => 'Hi')
+    .put('GET', '/id/:id', () => 'Hello')
+    .build();
+
+console.log(router.find({
+    method: 'GET',
+    path: ''
+})())

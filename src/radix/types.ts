@@ -3,19 +3,24 @@
  */
 export interface Context {
     /**
+     * Parsed pathname 
+     */
+    path?: string;
+
+    /**
      * The request URL
      */
-    url: string;
+    url?: string;
 
     /**
      * The pathname start index
      */
-    _pathStart: number;
+    _pathStart?: number;
 
     /**
      * Pathname end index (index of '?' or the end of the URL)
      */
-    _pathEnd: number;
+    _pathEnd?: number;
 
     /**
      * The URL parameters
@@ -63,6 +68,11 @@ export interface BuildContext {
     readonly substrStrategy: SubstrStrategy;
 
     /**
+     * If the path name is already parsed
+     */
+    readonly hasPath: boolean;
+
+    /**
      * The current ID of the store
      */
     currentID: number;
@@ -79,6 +89,7 @@ export type SubstrStrategy = 'substring' | 'slice';
 export interface Options {
     substr?: SubstrStrategy;
     contextName?: string;
+    matchPath?: boolean;
 }
 
 /**
@@ -89,6 +100,6 @@ export type Route<T> = [path: string, store: T];
 /**
  * A match function
  */
-export interface MatchFunction<T> {
-    (c: Context): T | null;
+export interface MatchFunction<T, C = Context> {
+    (c: C): T | null;
 }

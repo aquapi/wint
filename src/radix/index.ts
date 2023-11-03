@@ -9,13 +9,9 @@ export class Radix<T> {
     readonly tree: Tree<T> = new Tree;
 
     /**
-     * Router options
+     * Create a radix tree router
      */
-    readonly options: Options = {
-        substr: 'substring',
-        contextName: 'c',
-        matchPath: false
-    };
+    constructor(public readonly options: Options = {}) { }
 
     /**
      * Register routes

@@ -2,7 +2,7 @@ import { Radix } from './radix';
 import { MatchFunction, Route } from './radix/types';
 import { Router, Context } from './types';
 
-const noop = () => null;
+const noop = () => null, matchPath = { matchPath: true };
 
 class Wint<T> {
     /**
@@ -26,10 +26,8 @@ class Wint<T> {
     put(method: string, ...route: Route<T>) {
         // Parametric or wildcard
         if (route[0].includes('*') || route[0].includes(':')) {
-            if (!(method in this.trees)) {
-                this.trees[method] = new Radix;
-                this.trees[method].options.matchPath = true;
-            }
+            if (!(method in this.trees))
+                this.trees[method] = new Radix(matchPath);
 
             // Register the route on the corresponding tree
             this.trees[method].put(route);

@@ -12,7 +12,7 @@ Bun.build({
     target: 'bun',
     outdir: '.',
     minify: true,
-    entrypoints: [root + '/src/index.ts', '/src/turbo.ts']
+    entrypoints: [root + '/src/index.ts', root + '/src/turbo.ts']
 });
 
 // Build type declarations

@@ -4,7 +4,9 @@ import { Router } from './types';
 /**
  * Map by method
  */
-export interface Store<T> extends Record<string, T> { };
+export interface Store<T> extends Record<string, T> {
+    ALL?: T;
+};
 
 /**
  * Basic router. This router supports `ALL` method handler
@@ -13,12 +15,28 @@ class Wint<T> {
     /**
      * Internal tree for dynamic path matching
      */
-    readonly tree: Radix<Store<T>> = new Radix({ matchPath: true });
+    readonly radix: Radix<Store<T>> = new Radix;
 
     /**
-     * Static route store
+    * Register a route
+    */
+    put(method: string, path: string, handler: T) {
+        const h = this.radix.tree.store(path, { ALL: null });
+        h[method] = handler;
+    }
+
+    /**
+     * Build the router find function
      */
-    readonly static: Record<string, Store<T>> = {};
+    build() {
+        const find = this.radix.build().find;
+
+        // Plain radix tree match is faster in this case
+        this.find = c => {
+            var t = find(c);
+            return t ? (t[c.method] ?? t.ALL) : null;
+        }
+    }
 }
 
 // Define all method to implement here

@@ -70,12 +70,8 @@ class Wint<T> {
 
         // Build the actual function
         this.find = c => {
-            const matcher = matchers[c.method];
-            if (matcher) {
-                const staticMatcher = matcher[0][c.path];
-                return staticMatcher ?? matcher[1](c);
-            }
-            return null;
+            var matcher = matchers[c.method];
+            return matcher ? (matcher[0][c.path] ?? matcher[1](c)) : null;
         }
         return this;
     }

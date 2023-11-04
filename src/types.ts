@@ -9,14 +9,14 @@ export interface Context extends RadixContext {
     /**
      * The request path
      */
-    path: string;
+    path?: string;
 };
 
 export interface Router<T> {
     /**
      * Add a route handler
      */
-    put(method: string, ...route: Route<T>): void;
+    put(method: string, ...route: Route<T>): this;
     /**
      * Find the matching item
      */
@@ -25,6 +25,6 @@ export interface Router<T> {
     /**
      * Build the router handler
      */
-    build(): void;
+    build(): this;
 }
 

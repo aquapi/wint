@@ -27,7 +27,7 @@ const f = <T>(
     // Normal handler
     if (node.store !== null)
         result += methodCheck(
-            `${pathLen}===${ctx.pathEndName}`,
+            `${ctx.pathEndName}===${pathLen}`,
             node.store, ctx, null
         );
 

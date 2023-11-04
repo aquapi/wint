@@ -1,11 +1,17 @@
 {
-  "name": "wintjs",
+  "name": "wint-js",
   "main": "index.js",
   "type": "module",
   "devDependencies": {
     "bun-types": "latest",
     "typescript": "^5.0.0"
   },
-  "description": "A minimal, insanely fast router for all runtimes",
-  "types": "./types/index.d.ts"
+  "description": "A collection of minimal, insanely fast routers for all runtimes",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "build-test": "bun build.ts && bun test"
+  },
+  "repository": {
+    "url": "https://github.com/aquapi/wint"
+  }
 }

@@ -56,6 +56,7 @@ class Wint<T> {
             // Assign paths
             for (var route of this.static[method])
                 matchers[method][0][
+                    // Ignore first character because it always matches
                     route[0].substring(1)
                 ] = route[1];
         }

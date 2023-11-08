@@ -5,6 +5,7 @@ export default (options: Options): BuildContext => {
     options.contextName ??= 'c';
     options.substr ??= 'substring';
     options.matchPath ??= false;
+    options.minURLLen ??= 12;
 
     return {
         // Path start can be static if a static map is provided

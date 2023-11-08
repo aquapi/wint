@@ -70,9 +70,6 @@ const wint = new Wint<() => string>()
 // This is designed to be compatible with the `Request` object
 wint.find({
     method: 'POST',
-    url: 'http://localhost:3000/json',
-    _pathStart: 'http://localhost:3000'.length,
-    // Can leave as -1 because query is not presented
-    _pathEnd: -1
+    url: 'http://localhost:3000/json'
 }); // () => '{}'
 ```

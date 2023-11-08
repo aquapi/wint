@@ -90,6 +90,7 @@ export interface Options {
     substr?: SubstrStrategy;
     contextName?: string;
     matchPath?: boolean;
+    minURLLen?: number;
 }
 
 /**

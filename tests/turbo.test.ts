@@ -3,38 +3,33 @@ import Wint from '../turbo';
 import { test, expect } from 'bun:test';
 import register from './register';
 
-const router = register(new Wint<string>);
+const wint = new Wint<string>();
+wint.radixOptions.minURLLen = 0;
+
+const router = register(wint);
 
 test('Turbo router', () => {
     // Root path matching
     expect(router.find({
         method: 'GET',
-        url: '',
-        _pathStart: 0,
-        _pathEnd: 0
+        url: '/',
     })).toBe('A');
 
     // Different method
     expect(router.find({
         method: 'POST',
-        url: 'json',
-        _pathStart: 0,
-        _pathEnd: 4
+        url: '/json',
     })).toBe('B');
 
     // Dynamic path matching
     expect(router.find({
         method: 'GET',
-        url: 'id/90',
-        _pathStart: 0,
-        _pathEnd: 5
+        url: '/id/90'
     })).toBe('C');
 
     // Path param first
     expect(router.find({
         method: 'GET',
-        url: 'i/account',
-        _pathStart: 0,
-        _pathEnd: 9
+        url: '/i/account',
     })).toBe('D');
 });

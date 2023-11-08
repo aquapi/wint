@@ -1,10 +1,18 @@
 import { Radix } from './radix';
-import { MatchFunction, Route } from './radix/types';
+import buildPathParser from './radix/compiler/utils/buildPathParser';
+import { MatchFunction, Options, Route } from './radix/types';
 import { Router, Context } from './types';
 
-const noop = () => null, matchPath = { matchPath: true };
+const noop = () => null;
 
 class Wint<T> {
+    /**
+     * Radix tree options
+     */
+    radixOptions: Options = {
+        matchPath: true
+    };
+
     /**
      * Radix tree routers for dynamic matching
      */
@@ -27,7 +35,7 @@ class Wint<T> {
         // Parametric or wildcard
         if (route[0].includes('*') || route[0].includes(':')) {
             if (!(method in this.trees))
-                this.trees[method] = new Radix(matchPath);
+                this.trees[method] = new Radix(this.radixOptions);
 
             // Register the route on the corresponding tree
             this.trees[method].put(route);
@@ -69,10 +77,19 @@ class Wint<T> {
             matchers[method][1] = this.trees[method].build().find;
         }
 
+        // Parse path
+        const parsePath = buildPathParser(this.radixOptions);
+
         // Build the actual function
         this.find = c => {
             var matcher = matchers[c.method];
-            return matcher ? (matcher[0][c.path] ?? matcher[1](c)) : null;
+
+            if (matcher) {
+                parsePath(c);
+                return matcher[0][c.path] ?? matcher[1](c);
+            }
+
+            return null;
         }
         return this;
     }

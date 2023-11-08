@@ -9,24 +9,32 @@ test('Turbo router', () => {
     // Root path matching
     expect(router.find({
         method: 'GET',
-        path: ''
+        url: '',
+        _pathStart: 0,
+        _pathEnd: 0
     })).toBe('A');
 
     // Different method
     expect(router.find({
         method: 'POST',
-        path: 'json'
+        url: 'json',
+        _pathStart: 0,
+        _pathEnd: 4
     })).toBe('B');
 
     // Dynamic path matching
     expect(router.find({
         method: 'GET',
-        path: 'id/90'
+        url: 'id/90',
+        _pathStart: 0,
+        _pathEnd: 5
     })).toBe('C');
 
     // Path param first
     expect(router.find({
         method: 'GET',
-        path: 'i/account'
+        url: 'i/account',
+        _pathStart: 0,
+        _pathEnd: 9
     })).toBe('D');
 });

@@ -70,6 +70,9 @@ const wint = new Wint<() => string>()
 // This is designed to be compatible with the `Request` object
 wint.find({
     method: 'POST',
-    path: 'json' // Path should slice the first slash character
+    url: 'http://localhost:3000/json',
+    _pathStart: 'http://localhost:3000'.length,
+    // Can leave as -1 because query is not presented
+    _pathEnd: -1
 }); // () => '{}'
 ```

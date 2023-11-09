@@ -1,4 +1,5 @@
 import { BuildContext, Options } from '../../types';
+import { fallback } from '../constants';
 
 export default (options: Options): BuildContext => {
     // Fix missing options 
@@ -7,6 +8,8 @@ export default (options: Options): BuildContext => {
     options.matchPath ??= false;
     options.minURLLen ??= 12;
     options.directCall ??= false;
+
+    const caller = options.directCall ? `(${options.contextName})` : '';
 
     return {
         // Path start can be static if a static map is provided
@@ -20,10 +23,12 @@ export default (options: Options): BuildContext => {
         currentID: 0,
         paramsMap: {},
 
-        caller: options.directCall ? `(${options.contextName})` : '',
+        caller,
 
         substrStrategy: options.substr,
         contextName: options.contextName,
+
+        fallback: options.fallback ? fallback + caller : 'null',
 
         hasPath: options.matchPath
     }

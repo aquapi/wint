@@ -78,6 +78,11 @@ export interface BuildContext {
     readonly caller: string;
 
     /**
+     * Fallback variable or null
+     */
+    readonly fallback: string;
+
+    /**
      * The current ID of the store
      */
     currentID: number;
@@ -97,6 +102,7 @@ export interface Options {
     matchPath?: boolean;
     minURLLen?: number;
     directCall?: boolean;
+    fallback?: any;
 }
 
 /**

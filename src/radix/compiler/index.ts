@@ -3,6 +3,7 @@ import type { Tree } from '../tree';
 import type { MatchFunction } from '../types';
 import compileNode from './node';
 import createContext from './utils/createContext';
+import { fallback } from './constants';
 
 /**
  * Build a function body to pass into `Function` constructor later
@@ -20,8 +21,12 @@ export default <T>(
         false, false
     );
 
+    // Fallback
+    if (options.fallback)
+        ctx.paramsMap[fallback] = options.fallback;
+
     return Function(
         ...Object.keys(ctx.paramsMap),
-        `return ${ctx.contextName}=>{${content}return null}`
+        `return ${ctx.contextName}=>{${content}return ${ctx.fallback}}`
     )(...Object.values(ctx.paramsMap));
 }

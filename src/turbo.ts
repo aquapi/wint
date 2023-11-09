@@ -5,13 +5,14 @@ import { Router, Context } from './types';
 
 const noop = () => null;
 
+export interface Matchers<T> extends Record<string, [Record<string, T>, MatchFunction<T>]> { };
+
 class Wint<T> {
     /**
      * Radix tree options
      */
     radixOptions: Options = {
-        matchPath: true,
-        directCall: true
+        matchPath: true
     };
 
     /**
@@ -27,7 +28,7 @@ class Wint<T> {
     /**
      * Build matcher for validating request
      */
-    readonly matchers: Record<string, [Record<string, T>, MatchFunction<T>]> = {};
+    readonly matchers: Matchers<T> = {};
 
     /**
      * Register a route
@@ -78,49 +79,60 @@ class Wint<T> {
             matchers[method][1] = this.trees[method].build().find;
         }
 
-        this.#buildFinder(matchers);
+        this.buildFinder(
+            matchers, buildPathParser(this.radixOptions)
+        );
 
         return this;
     }
 
-    #buildFinder(matchers: any) {
-        // Parse path
-        const parsePath = buildPathParser(this.radixOptions);
-
+    buildFinder(matchers: Matchers<T>, parsePath: (c: Context) => void) {
         // Build the actual function
-        if (this.radixOptions.directCall)
-            this.query = c => {
-                var matcher = matchers[c.method];
+        this.find = c => {
+            var matcher = matchers[c.method];
 
-                if (matcher) {
-                    parsePath(c);
-                    return (matcher[0][c.path] ?? matcher[1])(c);
-                }
-
-                return null;
+            if (matcher) {
+                parsePath(c);
+                return matcher[0][c.path] ?? matcher[1](c);
             }
 
-        // Normal find
-        else
-            this.find = c => {
-                var matcher = matchers[c.method];
-
-                if (matcher) {
-                    parsePath(c);
-                    return matcher[0][c.path] ?? matcher[1](c);
-                }
-
-                return null;
-            }
-
+            return null;
+        }
     }
 }
 
 // Add a find function
 interface Wint<T> extends Router<T> {
     find(c: Context): T | null;
-    // Optimized
-    query(c: Context): any;
 }
 
+/**
+ * Direct call
+ */
+class FastWint<T extends (c: Context) => any> extends Wint<T> {
+    constructor() {
+        super();
+        this.radixOptions.directCall = true;
+    }
+
+    buildFinder(matchers: Matchers<T>, parsePath: (c: Context) => void): void {
+        // Direct call
+        this.query = c => {
+            var matcher = matchers[c.method];
+
+            if (matcher) {
+                parsePath(c);
+                return (matcher[0][c.path] ?? matcher[1])(c);
+            }
+
+            return null;
+        }
+    }
+}
+
+interface FastWint<T> {
+    query(c: Context): ReturnType<T>;
+}
+
+export { FastWint };
 export default Wint;

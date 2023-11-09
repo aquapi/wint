@@ -98,7 +98,7 @@ const f = <T>(
             const value = `${ctx.urlName}.${ctx.substrStrategy}(${prevIndex},${currentParamIndexName})`;
 
             // Additional check if no store is provided
-            result += (hasStore ? '' : `if(${currentParamIndexName}===-1)return null;`)
+            result += (hasStore ? '' : `if(${currentParamIndexName}===-1)return ${ctx.fallback};`)
                 + `${ctx.paramsName}${isChildParam
                     ? `.${key}=${value}`
                     : `={${key}:${value}}`

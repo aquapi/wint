@@ -8,5 +8,5 @@ export default <T>(
     preReturn: string | null,
 ) => (res === null ? '' : 'if(' + res + ')')
 + (preReturn === null ? '' : '{' + preReturn)
-+ `return ${insertStore(ctx, handler)}`
++ `return ${insertStore(ctx, handler)}${ctx.caller}`
 + (preReturn === null ? '' : '}') + ';';

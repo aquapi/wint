@@ -6,6 +6,7 @@ export default (options: Options): BuildContext => {
     options.substr ??= 'substring';
     options.matchPath ??= false;
     options.minURLLen ??= 12;
+    options.directCall ??= false;
 
     return {
         // Path start can be static if a static map is provided
@@ -18,6 +19,8 @@ export default (options: Options): BuildContext => {
         // These props will be changed
         currentID: 0,
         paramsMap: {},
+
+        caller: options.directCall ? `(${options.contextName})` : '',
 
         substrStrategy: options.substr,
         contextName: options.contextName,

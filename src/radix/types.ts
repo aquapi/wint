@@ -73,6 +73,11 @@ export interface BuildContext {
     readonly hasPath: boolean;
 
     /**
+     * Call arguments
+     */
+    readonly caller: string;
+
+    /**
      * The current ID of the store
      */
     currentID: number;
@@ -91,6 +96,7 @@ export interface Options {
     contextName?: string;
     matchPath?: boolean;
     minURLLen?: number;
+    directCall?: boolean;
 }
 
 /**

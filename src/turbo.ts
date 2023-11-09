@@ -10,7 +10,8 @@ class Wint<T> {
      * Radix tree options
      */
     radixOptions: Options = {
-        matchPath: true
+        matchPath: true,
+        directCall: true
     };
 
     /**
@@ -77,27 +78,49 @@ class Wint<T> {
             matchers[method][1] = this.trees[method].build().find;
         }
 
+        this.#buildFinder(matchers);
+
+        return this;
+    }
+
+    #buildFinder(matchers: any) {
         // Parse path
         const parsePath = buildPathParser(this.radixOptions);
 
         // Build the actual function
-        this.find = c => {
-            var matcher = matchers[c.method];
+        if (this.radixOptions.directCall)
+            this.query = c => {
+                var matcher = matchers[c.method];
 
-            if (matcher) {
-                parsePath(c);
-                return matcher[0][c.path] ?? matcher[1](c);
+                if (matcher) {
+                    parsePath(c);
+                    return (matcher[0][c.path] ?? matcher[1])(c);
+                }
+
+                return null;
             }
 
-            return null;
-        }
-        return this;
+        // Normal find
+        else
+            this.find = c => {
+                var matcher = matchers[c.method];
+
+                if (matcher) {
+                    parsePath(c);
+                    return matcher[0][c.path] ?? matcher[1](c);
+                }
+
+                return null;
+            }
+
     }
 }
 
 // Add a find function
 interface Wint<T> extends Router<T> {
     find(c: Context): T | null;
+    // Optimized
+    query(c: Context): any;
 }
 
 export default Wint;

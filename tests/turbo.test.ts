@@ -36,7 +36,7 @@ test('Turbo router', () => {
 
     // Path param first
     expect(router.query({
-        method: 'PUT',
-        url: '/i/insert',
+        method: 'GET',
+        url: '/json',
     })).toBe('E');
 });

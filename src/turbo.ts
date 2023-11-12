@@ -67,7 +67,8 @@ class Wint<T> {
         const matchers = this.matchers,
             // Handle fallback
             fn = this.radixOptions.fallback,
-            caller = () => fn;
+            // For direct call return the fallback directly
+            caller = this.radixOptions.directCall ? fn : (() => fn) as any;
 
         // Build matchers
         for (var method in this.static) {
@@ -85,7 +86,7 @@ class Wint<T> {
         // Build handlers for trees
         for (var method in this.trees) {
             if (!(method in this.matchers))
-                matchers[method] = [{}, caller];
+                matchers[method] = [{}, null];
 
             matchers[method][1] = this.trees[method].build().find;
         }

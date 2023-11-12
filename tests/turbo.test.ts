@@ -3,7 +3,7 @@ import { FastWint } from '../turbo';
 import { test, expect } from 'bun:test';
 import register from './register';
 
-const wint = new FastWint<string>();
+const wint = new FastWint<string>().fallback(() => 'E');
 wint.radixOptions.minURLLen = 0;
 
 const router = register(wint, true);
@@ -33,4 +33,10 @@ test('Turbo router', () => {
         method: 'GET',
         url: '/i/account',
     })).toBe('D');
+
+    // Path param first
+    expect(router.query({
+        method: 'PUT',
+        url: '/i/insert',
+    })).toBe('E');
 });

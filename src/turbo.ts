@@ -9,7 +9,7 @@ class Wint<T> {
     /**
      * Radix tree options
      */
-    radixOptions: Options = {
+    radixOptions: Options<T> = {
         matchPath: true,
         fallback: null
     };
@@ -47,6 +47,15 @@ class Wint<T> {
             // Save the path in a record object (normalize later)
             this.static[method].push(route);
         }
+
+        return this;
+    }
+
+    /**
+     * Set a fallback
+     */
+    fallback(t: T) {
+        this.radixOptions.fallback = t;
 
         return this;
     }
@@ -120,15 +129,15 @@ class FastWint<T> extends Wint<(c: Context) => T> {
 
     buildFinder(matchers: Matchers<(c: Context) => T>, parsePath: string): void {
         // Build the actual function
-        const ctx = this.radixOptions.contextName;
+        const ctx = this.radixOptions.contextName, fn = this.radixOptions.fallback;
 
         this.query = Function(
-            'f', '_', `return ${ctx}=>{`
+            'f', 't', `return ${ctx}=>{`
             // Search for the matcher
-            + `const m=_[c.method];`
+            + `const m=t[c.method];`
             // Check whether the matcher for the method does exist
-            + `if(m){${parsePath}return(m[0][${ctx}.path]??m[1])(${ctx})}` + `return f(${ctx})}`
-        )(this.radixOptions.fallback, matchers);
+            + `if(m){${parsePath}return(m[0][${ctx}.path]??m[1])(${ctx})}` + `return f(${fn.length === 0 ? '' : ctx})}`
+        )(fn, matchers);
     }
 }
 

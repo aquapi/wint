@@ -96,13 +96,13 @@ export type SubstrStrategy = 'substring' | 'slice';
 /**
  * Router option
  */
-export interface Options {
+export interface Options<T = any> {
     substr?: SubstrStrategy;
     contextName?: string;
     matchPath?: boolean;
     minURLLen?: number;
     directCall?: boolean;
-    fallback?: any;
+    fallback?: T | null;
 }
 
 /**

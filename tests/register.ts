@@ -1,9 +1,12 @@
 import { Router } from "../types/types";
 
-export default <T extends Router<string>>(t: T) => t
-    .put('GET', '/', 'A')
-    .put('POST', '/json', 'B')
-    .put('GET', '/id/:id', 'C')
-    .put('GET', '/:user/account', 'D')
+const f = (str: string, isFn: boolean) =>
+    isFn ? () => str : str
+
+export default <T extends Router<any>>(t: T, isFn: boolean = false) => t
+    .put('GET', '/', f('A', isFn))
+    .put('POST', '/json', f('B', isFn))
+    .put('GET', '/id/:id', f('C', isFn))
+    .put('GET', '/:user/account', f('D', isFn))
     .build();
 

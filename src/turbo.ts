@@ -22,7 +22,7 @@ class Wint<T> {
     /**
      * Map by method and pathname
      */
-    readonly static: Record<string, [string, T][]> = {};
+    readonly static: Record<string, Route<T>[]> = {};
 
     /**
      * Build matcher for validating request
@@ -32,20 +32,20 @@ class Wint<T> {
     /**
      * Register a route
      */
-    put(method: string, ...route: Route<T>) {
+    put<P extends Route<T>[0]>(method: string, path: P, f: Route<T>[1]) {
         // Parametric or wildcard
-        if (route[0].includes('*') || route[0].includes(':')) {
+        if (path.includes('*') || path.includes(':')) {
             if (!(method in this.trees))
                 this.trees[method] = new Radix(this.radixOptions);
 
             // Register the route on the corresponding tree
-            this.trees[method].put(route);
+            this.trees[method].put([path, f]);
         } else {
             if (!(method in this.static))
                 this.static[method] = [];
 
             // Save the path in a record object (normalize later)
-            this.static[method].push(route);
+            this.static[method].push([path, f]);
         }
 
         return this;
@@ -106,7 +106,7 @@ class Wint<T> {
         this.find = Function(
             'f', '_', `return ${ctx}=>{`
             // Search for the matcher
-            + `const m=_[c.method];`
+            + `const m=_[${ctx}.method];`
             // Check whether the matcher for the method does exist
             + `if(m){${parsePath}return m[0][${ctx}.path]??m[1](${ctx})}` + `return f}`
         )(this.radixOptions.fallback, matchers);
@@ -118,33 +118,4 @@ interface Wint<T> extends Router<T> {
     find(c: Context): T | null;
 }
 
-/**
- * Direct call
- */
-class FastWint<T> extends Wint<(c: Context) => T> {
-    constructor() {
-        super();
-        this.radixOptions.directCall = true;
-        this.radixOptions.fallback = () => null;
-    }
-
-    buildFinder(matchers: Matchers<(c: Context) => T>, parsePath: string): void {
-        // Build the actual function
-        const ctx = this.radixOptions.contextName, fn = this.radixOptions.fallback;
-
-        this.query = Function(
-            'f', 't', `return ${ctx}=>{`
-            // Search for the matcher
-            + `const m=t[c.method];`
-            // Check whether the matcher for the method does exist
-            + `if(m){${parsePath}return(m[0][${ctx}.path]??m[1])(${ctx})}` + `return f(${fn.length === 0 ? '' : ctx})}`
-        )(fn, matchers);
-    }
-}
-
-interface FastWint<T> {
-    query(c: Context): T;
-}
-
-export { FastWint };
 export default Wint;

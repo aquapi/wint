@@ -1,16 +1,4 @@
-import { Context as RadixContext, Route } from './radix/types';
-
-export interface Context extends RadixContext {
-    /**
-     * The request method
-     */
-    method: string;
-
-    /**
-     * The request path
-     */
-    path?: string;
-};
+import { Context, Route } from './radix/types';
 
 export interface Router<T> {
     /**
@@ -20,7 +8,7 @@ export interface Router<T> {
     /**
      * Find the matching item
      */
-    find(c: Context): T | null;
+    find(c: Partial<Context>): T | null;
 
     /**
      * Build the router handler
@@ -28,3 +16,4 @@ export interface Router<T> {
     build(): this;
 }
 
+export { Context };

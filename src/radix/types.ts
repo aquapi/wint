@@ -5,27 +5,32 @@ export interface Context {
     /**
      * Parsed pathname 
      */
-    path?: string;
+    path: string;
 
     /**
      * The request URL
      */
-    url?: string;
+    url: string;
 
     /**
      * The pathname start index
      */
-    _pathStart?: number;
+    _pathStart: number;
 
     /**
      * Pathname end index (index of '?' or the end of the URL)
      */
-    _pathEnd?: number;
+    _pathEnd: number;
 
     /**
      * The URL parameters
      */
-    params?: any;
+    params: any;
+
+    /**
+     * The method name
+     */
+    method: string;
 }
 
 /**

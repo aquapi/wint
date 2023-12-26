@@ -49,5 +49,5 @@ export class Radix<T> {
 }
 
 export interface Radix<T> {
-    find(c: Context): T;
+    find(c: Partial<Context>): T;
 };

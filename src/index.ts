@@ -1,5 +1,5 @@
 import { Radix } from './radix';
-import { Options } from './radix/types';
+import { Options, Context } from './radix/types';
 import { Router } from './types';
 
 /**
@@ -53,3 +53,5 @@ class Wint<T> {
 interface Wint<T> extends Router<T> { };
 
 export default Wint;
+
+export * from './framework';

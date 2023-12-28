@@ -11,7 +11,7 @@ export type Params<T extends string> = T extends `${infer Segment}/${infer Rest}
     ? { '*': string }
     : {};
 
-export interface Context<Path extends string = string, State extends Record<string, any> = {}> extends ResponseInit {
+export interface Context<Path extends string = string, State extends BaseState = {}> extends ResponseInit {
     /**
      * Raw request object
      */
@@ -25,11 +25,14 @@ export interface Context<Path extends string = string, State extends Record<stri
     /**
      * Request params
      */
-    params: Params<Path> & Record<string, string>;
+    params: Params<Path> & BaseParams;
 
     /**
      * Store state in requests
      */
-    state: State & Record<string, any>;
+    state: State & BaseState;
 }
 
+export interface BaseState extends Record<string, any> { };
+
+export interface BaseParams extends Record<string, string> { };

@@ -1,5 +1,5 @@
 import { Radix } from './radix';
-import { Options, Context } from './radix/types';
+import { Options } from './radix/types';
 import { Router } from './types';
 
 /**
@@ -54,4 +54,6 @@ interface Wint<T> extends Router<T> { };
 
 export default Wint;
 
-export * from './framework';
+// Internal router API for Stric
+import * as t from './framework';
+export { t };

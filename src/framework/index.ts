@@ -6,10 +6,9 @@ const req = 'req', pathStart = '_pathStart', pathEnd = '_pathEnd', ctx = 'c';
 /**
  * Stric-specific API
  */
-export const createContextMacro = () =>
-    `const ${pathStart}=${req}.url.indexOf('/',12)+1,`
+export const contextMacro = `const ${pathStart}=${req}.url.indexOf('/',12)+1,`
     + `${pathEnd}=${req}.url.indexOf('?',${pathStart}),`
-    + `${ctx}={${req},${pathStart},${pathEnd},path:${pathEnd}===-1?${req}.url.substring(${pathStart}):${req}.url.substring(${pathStart},${pathEnd}),headers:{},state:{}};`;
+    + `${ctx}={${req},${pathStart},${pathEnd},path:${pathEnd}===-1?${req}.url.substring(${pathStart}):${req}.url.substring(${pathStart},${pathEnd}),headers:{}};`;
 
 /**
  * Router designed specifically for Stric
@@ -30,7 +29,7 @@ class FastWint extends Wint<(c: Context) => any> {
             // Search for the matcher
             + `const m=t[${req}.method];`
             // Check whether the matcher for the method does exist
-            + `if(m){${createContextMacro()}`
+            + `if(m){${contextMacro}`
             + `return(m[0][${ctx}.path]??m[1])(${ctx})}`
         + `return f(${fn.length === 0 ? '' : ctx})}`
         )(fn, matchers);

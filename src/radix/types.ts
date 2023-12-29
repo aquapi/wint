@@ -109,6 +109,8 @@ export interface Options<T = any> {
     directCall?: boolean;
     fallback?: T | null;
     pathStart?: number;
+    // If the router does path parsing or not
+    parsePath?: boolean;
 }
 
 /**

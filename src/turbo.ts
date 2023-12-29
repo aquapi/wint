@@ -11,6 +11,7 @@ class Wint<T> {
      */
     radixOptions: Options<T> = {
         matchPath: true,
+        parsePath: true,
         fallback: null
     };
 
@@ -99,7 +100,7 @@ class Wint<T> {
         return this;
     }
 
-    buildFinder(matchers: Matchers<T>, parsePath: string) {
+    buildFinder(matchers: Matchers<T>, parsePath: ReturnType<typeof buildPathParser>) {
         // Build the actual function
         const ctx = this.radixOptions.contextName;
 
@@ -108,7 +109,7 @@ class Wint<T> {
             // Search for the matcher
             + `const m=_[${ctx}.method];`
             // Check whether the matcher for the method does exist
-            + `if(m){${parsePath}return m[0][${ctx}.path]??m[1](${ctx})}` + `return f}`
+            + `if(m){${parsePath.value}return m[0][${parsePath.path}]??m[1](${ctx})}` + `return f}`
         )(this.radixOptions.fallback, matchers);
     }
 }

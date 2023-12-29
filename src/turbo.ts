@@ -69,7 +69,8 @@ class Wint<T> {
             // Handle fallback
             fn = this.radixOptions.fallback,
             // For direct call return the fallback directly
-            caller = this.radixOptions.directCall ? fn : (() => fn) as any;
+            caller = this.radixOptions.directCall ? fn : (() => fn) as any,
+            doParsePath = this.radixOptions.parsePath;
 
         // Build matchers
         for (var method in this.static) {
@@ -79,8 +80,8 @@ class Wint<T> {
             // Assign paths
             for (var route of this.static[method])
                 matchers[method][0][
-                    // Ignore first character because it always matches
-                    route[0].substring(1)
+                    // Ignore first character because it always matches (not for raw URL match)
+                    doParsePath ? route[0].substring(1) : route[0]
                 ] = route[1];
         }
 

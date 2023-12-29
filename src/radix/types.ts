@@ -108,6 +108,7 @@ export interface Options<T = any> {
     minURLLen?: number;
     directCall?: boolean;
     fallback?: T | null;
+    pathStart?: number;
 }
 
 /**

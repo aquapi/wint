@@ -13,7 +13,7 @@ export default (options: Options): BuildContext => {
 
     return {
         // Path start can be static if a static map is provided
-        pathStartName: options.matchPath ? '0' : options.contextName + '._pathStart',
+        pathStartName: options.matchPath ? (options.pathStart?.toString() ?? '0') : options.contextName + '._pathStart',
         pathEndName: options.contextName + '.' + (options.matchPath ? 'path.length' : '_pathEnd'),
 
         urlName: options.contextName + '.' + (options.matchPath ? 'path' : 'url'),

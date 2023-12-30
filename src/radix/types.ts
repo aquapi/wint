@@ -104,12 +104,23 @@ export type SubstrStrategy = 'substring' | 'slice';
 export interface Options<T = any> {
     substr?: SubstrStrategy;
     contextName?: string;
+    /**
+     * Whether to match using c.path or c.url
+     */
     matchPath?: boolean;
+    /**
+     * Index of
+     */
     minURLLen?: number;
     directCall?: boolean;
     fallback?: T | null;
+    /**
+     * Start index for URL matching
+     */
     pathStart?: number;
-    // If the router does path parsing or not
+    /**
+     * Set this to false to remove path parsing even when path is not provided (use c.url)
+     */
     parsePath?: boolean;
 }
 

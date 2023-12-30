@@ -7,8 +7,8 @@ export default <T>(
     node: Node<T>,
     prevPathLen: string, pathLen: string
 ) => {
-    // Much faster than doing substring
-    if (node.part.length < 3) {
+    // Faster than doing substring
+    if (node.part.length < 15) {
         let result = '';
 
         for (var i = 1; i < node.part.length; ++i) {

@@ -31,6 +31,16 @@ export interface Context<Path extends string = string, State extends BaseState =
      * Store state in requests
      */
     state: State & BaseState;
+
+    /**
+     * URL path start
+     */
+    _pathStart: number;
+
+    /**
+     * URL path end
+     */
+    _pathEnd: number;
 }
 
 export interface BaseState extends Record<string, any> { };

@@ -30,10 +30,9 @@ class FastWint extends Wint<(c: Context) => any> {
             'f', 't', `return ${req}=>{`
             // Search for the matcher
             + `const m=t[${req}.method];`
+            + `if(typeof m==='undefined')return f(${fn.length === 0 ? '' : ctx});`
             // Check whether the matcher for the method does exist
-            + `if(m){${contextMacro(this.radixOptions)}`
-            + `return(m[0][${ctx}.path]??m[1])(${ctx})}`
-        + `return f(${fn.length === 0 ? '' : ctx})}`
+            + `${contextMacro(this.radixOptions)}` + `return(m[0][${ctx}.path]??m[1])(${ctx})`
         )(fn, matchers);
     }
 }

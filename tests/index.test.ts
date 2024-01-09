@@ -29,5 +29,11 @@ test('Basic router', () => {
         method: 'GET',
         path: 'i/account'
     })).toBe('D');
+
+    // Null check
+    expect(router.find({
+        method: 'PUT',
+        path: 'a/b'
+    })).toBeNil();
 });
 

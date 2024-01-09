@@ -108,9 +108,9 @@ class Wint<T> {
         this.find = Function(
             'f', '_', `return ${ctx}=>{`
             // Search for the matcher
-            + `const m=_[${ctx}.method];`
+            + `const m=_[${ctx}.method];if(typeof m==='undefined')return f;`
             // Check whether the matcher for the method does exist
-            + `if(m){${parsePath.value}return m[0][${parsePath.path}]??m[1](${ctx})}` + `return f}`
+            + `${parsePath.value}return m[0][${parsePath.path}]??m[1](${ctx})` + `}`
         )(this.radixOptions.fallback, matchers);
     }
 }

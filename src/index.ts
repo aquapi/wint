@@ -41,8 +41,8 @@ class Wint<T> {
 
         // Plain radix tree match is faster in this case
         this.find = c => {
-            var t = find(c);
-            return t ? (t[c.method] ?? t.ALL) : null;
+            const t = find(c);
+            return t === null ? null : (t[c.method] ?? t.ALL);
         }
 
         return this;

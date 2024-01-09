@@ -1,19 +1,28 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'fs';
+import pkg from './package.json';
 
-// Generating types
-const root = import.meta.dir, dir = root + '/types';
+const root = import.meta.dir;
 
-if (existsSync(dir))
-    rmSync(dir, { recursive: true });
+const libDir = root + '/lib';
+if (existsSync(libDir))
+    rmSync(libDir, { recursive: true });
 
+// Bundle all with Bun
 Bun.build({
     format: 'esm',
     target: 'bun',
-    outdir: '.',
+    outdir: libDir,
     minify: true,
-    entrypoints: [root + '/src/index.ts', root + '/src/turbo.ts']
-});
+    entrypoints: [
+        './src/index.ts', './src/turbo.ts',
+        './src/split.ts',
+    ],
+    external: Object.keys(pkg.dependencies ?? {})
+}).then(console.log);
 
 // Build type declarations
-Bun.spawn(['bun', 'x', 'tsc', '--outdir', dir], { stdout: 'inherit' });
+Bun.spawn(['bun', 'x', 'tsc', '--outdir', libDir], {
+    stdout: 'inherit',
+    stderr: 'inherit'
+});

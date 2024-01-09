@@ -1,3 +1,5 @@
+import { Context } from './types';
+
 interface Node<T> {
     value: T | null;
 
@@ -13,7 +15,7 @@ interface ParamsNode<T> extends Node<T> {
 }
 
 interface WildcardNode<T> extends Node<T> {
-    wildcard: Node<T>;
+    wildcard: T;
 }
 
 type GenericNode<T> = Partial<ParamsNode<T> & WildcardNode<T> & Parameter> & Node<T>;
@@ -29,18 +31,22 @@ class Node<T> {
     }
 }
 
-export class Tree<T> {
+export class SplitRouter<T> {
     root: GenericNode<T> = Node.init();
     defaultResult: T = null;
+    staticMap: Record<string, T> = {};
 
-    put(path: string) {
+    put(path: string, value: T) {
         if (path.startsWith('/'))
             path = path.substring(1);
         if (path.endsWith('/'))
             path = path.substring(0, path.length - 1);
 
-        if (path === '')
-            return this.root;
+        // If path is static
+        if (!path.includes(':') && !path.endsWith('*')) {
+            this.staticMap[path] = value;
+            return;
+        }
 
         const parts = path.split('/');
         let node = this.root;
@@ -48,13 +54,16 @@ export class Tree<T> {
         for (let i = 0, partsLen = parts.length; i < partsLen; ++i) {
             const part = parts[i];
 
-            // End of path so we can break
+            // End of path so we can return directly
             if (part === '*') {
-                node = node.wildcard = Node.init();
-                break;
+                node.wildcard = value;
+                return;
             }
 
             if (part.startsWith(':')) {
+                if (node.parameter !== null)
+                    throw new Error(`Parameter ${part.substring(1)} collided with previously registered parameter ${node.parameter.name}.`);
+
                 node = node.parameter = Node.init();
                 node.name = part.substring(1);
                 continue;
@@ -66,7 +75,7 @@ export class Tree<T> {
             node = node.inerts[part];
         }
 
-        return node;
+        node.value = value;
     }
 
     /**
@@ -74,19 +83,23 @@ export class Tree<T> {
      * Only use this for dynamic path matching
      */
     build() {
-        const { root, defaultResult } = this;
+        const { root, defaultResult, staticMap } = this;
 
-        return (ctx: { path: string, params?: any }): T | null => {
-            const { path } = ctx;
+        return (ctx: Context): T | null => {
+            const { path } = ctx, res = staticMap[path];
+            if (typeof res !== 'undefined')
+                return res;
 
             // Always a wildcard match at root
             if (path === '') {
+                if (root.wildcard === null) return defaultResult;
+
                 ctx.params = { '*': path };
                 return root.value;
             }
 
             let node = root,
-                wildcard: Node<T> = null,
+                wildcardValue: T = null,
                 wildcardIndex: number;
 
             const parts = path.split('/'), params = {};
@@ -94,7 +107,7 @@ export class Tree<T> {
             for (let i = 0, partsLen = parts.length; i < partsLen; ++i) {
                 // If a wildcard exists
                 if (node.wildcard !== null) {
-                    wildcard = node.wildcard;
+                    wildcardValue = node.wildcard;
                     wildcardIndex = i;
                 }
 
@@ -111,10 +124,12 @@ export class Tree<T> {
             }
 
             if (node.value === null) {
-                if (wildcard === null) return defaultResult;
+                if (wildcardValue === null) return defaultResult;
 
                 params['*'] = parts.slice(wildcardIndex).join('/');
-                node = wildcard;
+                ctx.params = params;
+
+                return wildcardValue;
             }
 
             ctx.params = params;

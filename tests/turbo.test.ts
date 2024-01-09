@@ -1,5 +1,5 @@
 /// <reference types='bun-types' />
-import Wint from '../turbo';
+import Wint from '../lib/turbo';
 import { test, expect } from 'bun:test';
 import register from './register';
 

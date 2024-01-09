@@ -1,6 +1,6 @@
 {
   "name": "wint-js",
-  "main": "index.js",
+  "main": "lib/index.js",
   "version": "1.2.4",
   "type": "module",
   "devDependencies": {
@@ -9,11 +9,15 @@
     "typescript": "^5.0.0"
   },
   "description": "A collection of minimal, insanely fast routers for all runtimes",
-  "types": "./types/index.d.ts",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "build-test": "bun build.ts && bun test"
   },
   "repository": {
     "url": "https://github.com/aquapi/wint"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
   }
 }

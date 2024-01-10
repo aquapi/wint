@@ -31,7 +31,11 @@ class Node<T> {
     }
 }
 
-export class SplitRouter<T> {
+interface Router<T> {
+    find(c: Partial<Context>): T | null;
+}
+
+class Router<T> {
     root: GenericNode<T> = Node.init();
     defaultResult: T = null;
     staticMap: Record<string, T> = {};
@@ -57,7 +61,7 @@ export class SplitRouter<T> {
             // End of path so we can return directly
             if (part === '*') {
                 node.wildcard = value;
-                return;
+                return this;
             }
 
             if (part.startsWith(':')) {
@@ -76,16 +80,16 @@ export class SplitRouter<T> {
         }
 
         node.value = value;
+        return this;
     }
 
     /**
      * Match a path (path should not start or end with a slash)
-     * Only use this for dynamic path matching
      */
     build() {
         const { root, defaultResult, staticMap } = this;
 
-        return (ctx: Context): T | null => {
+        this.find = ctx => {
             const { path } = ctx, res = staticMap[path];
             if (typeof res !== 'undefined')
                 return res;
@@ -135,5 +139,9 @@ export class SplitRouter<T> {
             ctx.params = params;
             return node.value;
         }
+
+        return this;
     }
 }
+
+export { Router };

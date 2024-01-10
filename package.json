@@ -11,7 +11,9 @@
   "description": "A collection of minimal, insanely fast routers for all runtimes",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "build-test": "bun build.ts && bun test"
+    "build-test": "bun build.ts && bun test",
+    "bench": "BUN_JSC_jitPolicyScale=0.0 BUN_JSC_thresholdForOptimizeSoon=0.0 bun tests/bench.ts",
+    "bench-jitless": "BUN_JSC_UseJit=0 bun tests/bench.ts"
   },
   "repository": {
     "url": "https://github.com/aquapi/wint"

@@ -56,4 +56,4 @@ export default Wint;
 
 // Internal router API for Stric
 import * as t from './framework';
-export { t };
+export { t, Radix as Router };

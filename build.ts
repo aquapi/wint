@@ -15,8 +15,7 @@ Bun.build({
     outdir: libDir,
     minify: true,
     entrypoints: [
-        './src/index.ts', './src/turbo.ts',
-        './src/split.ts',
+        './src/index.ts', './src/turbo.ts'
     ],
     external: Object.keys(pkg.dependencies ?? {})
 }).then(console.log);

@@ -1,7 +1,7 @@
 {
   "name": "wint-js",
   "main": "lib/index.js",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "type": "module",
   "devDependencies": {
     "bun-types": "latest",

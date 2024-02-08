@@ -13,9 +13,7 @@ export default <T>(
     options: Options,
 ): MatchFunction<T> => {
     // Global context
-    const ctx = createContext(options);
-
-    let content = compileNode(
+    const ctx = createContext(options), content = compileNode(
         tree.root, ctx,
         ctx.pathStartName,
         false, false
@@ -27,6 +25,6 @@ export default <T>(
 
     return Function(
         ...Object.keys(ctx.paramsMap),
-        `return ${ctx.contextName}=>{${content}return ${ctx.fallback}}`
+        `return ${ctx.contextName}=>{${content.join('')}return ${ctx.fallback}}`
     )(...Object.values(ctx.paramsMap));
 }

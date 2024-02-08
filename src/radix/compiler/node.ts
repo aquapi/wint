@@ -77,7 +77,9 @@ const f = <T>(
 
         // Declare previous param index
         if (isChildParam) {
-            builder.push(isNestedChildParam ? '' : 'let ');
+            if (!isNestedChildParam)
+                builder.push('let ');
+
             builder.push(`${prevParamIndexName}=${pathLen};`);
         }
 
@@ -88,7 +90,9 @@ const f = <T>(
 
         // Declare the current param index variable if inert is found
         if (hasInert) {
-            builder.push(isChildParam ? '' : 'let ');
+            if (!isChildParam)
+                builder.push('let ');
+
             builder.push(`${currentParamIndexName}=${nextSlashIndex};`);
         }
 

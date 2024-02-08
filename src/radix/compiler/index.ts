@@ -13,7 +13,8 @@ export default <T>(
     options: Options,
 ): MatchFunction<T> => {
     // Global context
-    const ctx = createContext(options), content = compileNode(
+    const ctx = createContext(options);
+    const content = compileNode(
         tree.root, ctx,
         ctx.pathStartName,
         false, false

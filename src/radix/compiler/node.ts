@@ -5,8 +5,6 @@ import methodCheck from './utils/methodCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
 import createIf from './utils/createIf';
 
-const arrPush = Array.prototype.push;
-
 const f = <T>(
     node: Node<T>,
     ctx: BuildContext,
@@ -42,8 +40,7 @@ const f = <T>(
         if (node.inert.size === 1) {
             builder.push(`if(${ctx.urlName}.charCodeAt(${pathLen})===${it.value})`);
 
-            // Small optimization
-            arrPush.apply(builder, f(
+            builder.push(...f(
                 node.inert.get(it.value)!, ctx,
                 plus(pathLen, 1), isChildParam, isNestedChildParam
             ));
@@ -57,8 +54,7 @@ const f = <T>(
                 // Handle case statement stuff
                 builder.push(`case ${it.value}:`);
 
-                // Small optimization
-                arrPush.apply(builder, f(
+                builder.push(...f(
                     node.inert.get(it.value)!, ctx,
                     plus(pathLen, 1), isChildParam, isNestedChildParam
                 ));
@@ -128,7 +124,7 @@ const f = <T>(
             );
 
             // Handle inert
-            arrPush.apply(builder, f(
+            builder.push(...f(
                 node.params.inert!, ctx,
                 plus(currentParamIndexName, 1), true,
                 // If this is the first inert this will be false

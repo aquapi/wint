@@ -17,7 +17,7 @@ export class Radix<T> {
      * Register routes
      */
     routes(routes: Route<T>[]) {
-        for (var route of routes)
+        for (const route of routes)
             this.tree.store(route[0], route[1]);
 
         return this;

@@ -22,7 +22,7 @@ const
         part,
         store: null,
         inert:
-            inert !== undefined
+            typeof inert !== 'undefined'
                 ? new Map(inert.map((child) => [child.part.charCodeAt(0), child]))
                 : null,
         params: null,
@@ -59,7 +59,7 @@ export class Tree<T> {
             path = path.slice(0, -1);
 
         const inertParts = path.split(staticRegex),
-            paramParts = path.match(paramsRegex) || [];
+            paramParts = path.match(paramsRegex) ?? [];
 
         if (inertParts[inertParts.length - 1] === '') inertParts.pop();
 
@@ -67,8 +67,8 @@ export class Tree<T> {
 
         let node = this.root, paramPartsIndex = 0;
 
-        for (var i = 0; i < inertParts.length; ++i) {
-            var part = inertParts[i];
+        for (let i = 0; i < inertParts.length; ++i) {
+            let part = inertParts[i];
 
             if (i > 0) {
                 // Set param on the node
@@ -93,7 +93,7 @@ export class Tree<T> {
                 node = params.inert;
             }
 
-            for (var j = 0; ;) {
+            for (let j = 0; ;) {
                 if (j === part.length) {
                     if (j < node.part.length) {
                         // Move the current node down

@@ -8,6 +8,7 @@ bun.lockb
 
 # Test
 tests
+bench
 
 # Development
 src

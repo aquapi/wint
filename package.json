@@ -12,8 +12,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build-test": "bun build.ts && bun test",
-    "bench": "BUN_JSC_jitPolicyScale=0.0 BUN_JSC_thresholdForOptimizeSoon=0.0 bun tests/bench.ts",
-    "bench-jitless": "BUN_JSC_UseJit=0 bun tests/bench.ts"
+    "jit": "BUN_JSC_jitPolicyScale=0.0 BUN_JSC_thresholdForOptimizeSoon=0.0 bun run",
+    "jitless": "BUN_JSC_UseJit=0 bun run"
   },
   "repository": {
     "url": "https://github.com/aquapi/wint"

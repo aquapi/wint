@@ -6,7 +6,8 @@ export default <T>(
     res: string | null, handler: T,
     ctx: BuildContext,
     preReturn: string | null,
-) => (res === null ? '' : 'if(' + res + ')')
-+ (preReturn === null ? '' : '{' + preReturn)
-+ `return ${insertStore(ctx, handler)}${ctx.caller}`
-+ (preReturn === null ? '' : '}') + ';';
+) => // 
+    (res === null ? '' : 'if(' + res + ')')
+    + (preReturn === null ? '' : '{' + preReturn)
+    + `return ${insertStore(ctx, handler)}${ctx.caller}`
+    + (preReturn === null ? '' : '}') + ';';

@@ -73,12 +73,12 @@ class Wint<T> {
             doParsePath = this.radixOptions.parsePath;
 
         // Build matchers
-        for (var method in this.static) {
+        for (const method in this.static) {
             if (!(method in matchers))
                 matchers[method] = [{}, caller];
 
             // Assign paths
-            for (var route of this.static[method])
+            for (const route of this.static[method])
                 matchers[method][0][
                     // Ignore first character because it always matches (not for raw URL match)
                     doParsePath ? route[0].substring(1) : route[0]
@@ -86,7 +86,7 @@ class Wint<T> {
         }
 
         // Build handlers for trees
-        for (var method in this.trees) {
+        for (const method in this.trees) {
             if (!(method in this.matchers))
                 matchers[method] = [{}, null];
 

@@ -18,22 +18,22 @@ export interface Node<T> {
 }
 
 const
+    buildInertMap = (inert: Node<any>[]) => {
+        const map = new Map;
+
+        for (let i = 0, { length } = inert; i < length; ++i)
+            map.set(inert[i].part.charCodeAt(0), inert[i]);
+
+        return map;
+    },
     createNode = <T>(part: string, inert?: Node<T>[]): Node<T> => ({
         part,
         store: null,
-        inert:
-            typeof inert !== 'undefined'
-                ? new Map(inert.map((child) => [child.part.charCodeAt(0), child]))
-                : null,
+        inert: typeof inert === 'undefined' ? null : buildInertMap(inert),
         params: null,
         wildcardStore: null
     }),
-
-    cloneNode = <T>(node: Node<T>, part: string) => ({
-        ...node,
-        part
-    }),
-
+    cloneNode = <T>(node: Node<T>, part: string) => ({ ...node, part }),
     createParamNode = <T>(paramName: string): ParamNode<T> => ({
         paramName,
         store: null,
@@ -47,24 +47,18 @@ export class Tree<T> {
     root: Node<T>;
 
     store(path: string, store: T): FindResult<T>['store'] {
-        if (typeof path !== 'string')
-            throw new TypeError('Route path must be a string');
+        // Path should start with '/'
+        if (path.charCodeAt(0) !== 47) path = '/' + path;
 
-        if (path === '') path = '/';
-        else if (path[0] !== '/') path = '/' + path;
-
-        const isWildcard = path[path.length - 1] === '*';
-        if (isWildcard)
-            // Slice off trailing '*'
-            path = path.slice(0, -1);
+        const isWildcard = path.charCodeAt(path.length - 1) === 42;
+        if (isWildcard) path = path.slice(0, -1);
 
         const inertParts = path.split(staticRegex),
             paramParts = path.match(paramsRegex) ?? [];
 
-        if (inertParts[inertParts.length - 1] === '') inertParts.pop();
+        if (inertParts[inertParts.length - 1].length === 0) inertParts.pop();
 
         if (!this.root) this.root = createNode<T>('/');
-
         let node = this.root, paramPartsIndex = 0;
 
         for (let i = 0; i < inertParts.length; ++i) {

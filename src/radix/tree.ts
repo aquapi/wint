@@ -95,17 +95,19 @@ export class Tree<T> {
 
             for (let j = 0; ;) {
                 if (j === part.length) {
-                    if (j < node.part.length) {
+                    if (j < node.part.length)
                         // Move the current node down
-                        const childNode = cloneNode(node, node.part.slice(j));
-                        assignNode(node, part, [childNode]);
-                    }
+                        assignNode(node, part, [
+                            cloneNode(node, node.part.slice(j))
+                        ]);
+
                     break;
                 }
 
                 if (j === node.part.length) {
                     // Add static child
                     if (node.inert === null) node.inert = new Map();
+
                     else if (node.inert.has(part.charCodeAt(j))) {
                         // Re-run loop with existing static node
                         node = node.inert.get(part.charCodeAt(j))!;
@@ -124,10 +126,12 @@ export class Tree<T> {
 
                 if (part[j] !== node.part[j]) {
                     // Split the node
-                    const existingChild = cloneNode(node, node.part.slice(j));
                     const newChild = createNode(part.slice(j));
 
-                    assignNode(node, node.part.slice(0, j), [existingChild, newChild]);
+                    assignNode(node, node.part.slice(0, j), [
+                        cloneNode(node, node.part.slice(j)),
+                        newChild
+                    ]);
 
                     node = newChild;
                     break;

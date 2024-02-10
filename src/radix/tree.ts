@@ -26,15 +26,21 @@ const
 
         return map;
     },
-    createNode = <T>(part: string, inert?: Node<T>[]): Node<T> => ({
+    // Object.assign(node, createNode(...))
+    assignNode = (node: Node<any>, part: string, inert: Node<any>[]) => {
+        node.part = part;
+        node.inert = buildInertMap(inert);
+        node.store = node.params = node.wildcardStore = null;
+    },
+    createNode = (part: string, inert?: Node<any>[]): Node<any> => ({
         part,
         store: null,
         inert: typeof inert === 'undefined' ? null : buildInertMap(inert),
         params: null,
         wildcardStore: null
     }),
-    cloneNode = <T>(node: Node<T>, part: string) => ({ ...node, part }),
-    createParamNode = <T>(paramName: string): ParamNode<T> => ({
+    cloneNode = (node: Node<any>, part: string) => ({ ...node, part }),
+    createParamNode = (paramName: string): ParamNode<any> => ({
         paramName,
         store: null,
         inert: null
@@ -58,7 +64,7 @@ export class Tree<T> {
 
         if (inertParts[inertParts.length - 1].length === 0) inertParts.pop();
 
-        if (!this.root) this.root = createNode<T>('/');
+        if (!this.root) this.root = createNode('/');
         let node = this.root, paramPartsIndex = 0;
 
         for (let i = 0; i < inertParts.length; ++i) {
@@ -92,7 +98,7 @@ export class Tree<T> {
                     if (j < node.part.length) {
                         // Move the current node down
                         const childNode = cloneNode(node, node.part.slice(j));
-                        Object.assign(node, createNode(part, [childNode]));
+                        assignNode(node, part, [childNode]);
                     }
                     break;
                 }
@@ -109,7 +115,7 @@ export class Tree<T> {
                     }
 
                     // Create new node
-                    const childNode = createNode<T>(part.slice(j));
+                    const childNode = createNode(part.slice(j));
                     node.inert.set(part.charCodeAt(j), childNode);
                     node = childNode;
 
@@ -119,15 +125,9 @@ export class Tree<T> {
                 if (part[j] !== node.part[j]) {
                     // Split the node
                     const existingChild = cloneNode(node, node.part.slice(j));
-                    const newChild = createNode<T>(part.slice(j));
+                    const newChild = createNode(part.slice(j));
 
-                    Object.assign(
-                        node,
-                        createNode(node.part.slice(0, j), [
-                            existingChild,
-                            newChild
-                        ])
-                    );
+                    assignNode(node, node.part.slice(0, j), [existingChild, newChild]);
 
                     node = newChild;
                     break;

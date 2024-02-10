@@ -39,7 +39,13 @@ const
         params: null,
         wildcardStore: null
     }),
-    cloneNode = (node: Node<any>, part: string) => ({ ...node, part }),
+    cloneNode = (node: Node<any>, part: string): Node<any> => ({
+        part,
+        store: node.store,
+        inert: node.inert,
+        params: node.params,
+        wildcardStore: node.wildcardStore
+    }),
     createParamNode = (paramName: string): ParamNode<any> => ({
         paramName,
         store: null,
@@ -50,7 +56,7 @@ const
     paramsRegex = /:.+?(?=\/|$)/g;
 
 export class Tree<T> {
-    root: Node<T>;
+    root: Node<T> = createNode('/');
 
     store(path: string, store: T): FindResult<T>['store'] {
         // Path should start with '/'
@@ -64,7 +70,6 @@ export class Tree<T> {
 
         if (inertParts[inertParts.length - 1].length === 0) inertParts.pop();
 
-        if (!this.root) this.root = createNode('/');
         let node = this.root, paramPartsIndex = 0;
 
         for (let i = 0; i < inertParts.length; ++i) {

@@ -32,10 +32,10 @@ const
         node.inert = buildInertMap(inert);
         node.store = node.params = node.wildcardStore = null;
     },
-    createNode = (part: string, inert?: Node<any>[]): Node<any> => ({
+    createNode = (part: string): Node<any> => ({
         part,
         store: null,
-        inert: typeof inert === 'undefined' ? null : buildInertMap(inert),
+        inert: null,
         params: null,
         wildcardStore: null
     }),
@@ -72,12 +72,13 @@ export class Tree<T> {
 
         let node = this.root, paramPartsIndex = 0;
 
-        for (let i = 0; i < inertParts.length; ++i) {
+        for (let i = 0, { length } = inertParts; i < length; ++i) {
             let part = inertParts[i];
 
             if (i > 0) {
                 // Set param on the node
-                const param = paramParts[paramPartsIndex++].slice(1);
+                const param = paramParts[paramPartsIndex].slice(1);
+                ++paramPartsIndex;
 
                 if (node.params === null)
                     node.params = createParamNode(param);

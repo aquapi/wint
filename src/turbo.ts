@@ -33,7 +33,7 @@ class Wint<T> {
     /**
      * Register a route
      */
-    put<P extends Route<T>[0]>(method: string, path: P, f: Route<T>[1]) {
+    put<P extends Route<T>[0]>(method: string, path: P, f: Route<T>[1]): this {
         // Parametric or wildcard
         if (path.includes('*') || path.includes(':')) {
             if (!(method in this.trees))
@@ -55,7 +55,7 @@ class Wint<T> {
     /**
      * Set a fallback
      */
-    fallback(t: T) {
+    fallback(t: T): this {
         this.radixOptions.fallback = t;
 
         return this;
@@ -64,11 +64,11 @@ class Wint<T> {
     /**
      * Build matchers
      */
-    build() {
+    build(): this {
         const matchers = this.matchers,
             // Handle fallback
             fn = this.radixOptions.fallback,
-            // For direct call return the fallback directly
+            // For direct call optimizer call the fallback directly at return
             caller = this.radixOptions.directCall ? fn : (() => fn) as any,
             doParsePath = this.radixOptions.parsePath;
 
@@ -101,9 +101,12 @@ class Wint<T> {
         return this;
     }
 
-    buildFinder(matchers: Matchers<T>, parsePath: ReturnType<typeof buildPathParser>) {
+    buildFinder(matchers: Matchers<T>, parsePath: ReturnType<typeof buildPathParser>): void {
         // Build the actual function
         const ctx = this.radixOptions.contextName;
+
+        if (this.radixOptions.directCall)
+            console.warn('Direct call optimization fallback is not handled correctly by the default turbo router "buildFinder".');
 
         this.find = Function(
             'f', '_', `return ${ctx}=>{`

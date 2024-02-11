@@ -1,69 +1,70 @@
 import type { Node } from '../tree';
 import plus from './utils/plus';
 import type { BuildContext } from '../types';
-import methodCheck from './utils/methodCheck';
+import storeCheck from './utils/storeCheck';
 import { currentParamIndexName, prevParamIndexName } from './constants';
-import createIf from './utils/createIf';
+import createTopLevelCheck from './utils/createTopLevelCheck';
 
-const f = <T>(
-    node: Node<T>,
+const f = (
+    node: Node<any>,
     ctx: BuildContext,
     prevPathLen: string,
+    // Whether parameters exist
     isChildParam: boolean,
+    // Whether the index tracker for parameters exists (not creating many variables)
     isNestedChildParam: boolean
 ) => {
-    let builder: string[] = [];
-
     // Get current pathname
-    let
-        isRoot = node.part.length === 1,
+    const
+        builder: string[] = [],
+        isNotRoot = node.part.length !== 1,
         pathLen = plus(
             prevPathLen,
             node.part.length - 1
         );
 
     // No condition check for root
-    if (!isRoot)
-        builder.push(createIf(ctx, node, prevPathLen, pathLen), '{');
+    if (isNotRoot)
+        builder.push(createTopLevelCheck(ctx, node, prevPathLen, pathLen), '{');
 
     // Normal handler
     if (node.store !== null)
-        builder.push(methodCheck(
+        builder.push(storeCheck(
             `${ctx.pathEndName}===${pathLen}`,
             node.store, ctx, null
         ));
 
     if (node.inert !== null) {
-        let keys = node.inert.keys(), it = keys.next();
+        const keys = node.inert.keys(), newPathLen = plus(pathLen, 1);
+        let it = keys.next();
 
-        // Only one item
+        // Create an if statement for only one item
         if (node.inert.size === 1) {
             builder.push(`if(${ctx.urlName}.charCodeAt(${pathLen})===${it.value})`);
 
             builder.push(...f(
                 node.inert.get(it.value)!, ctx,
-                plus(pathLen, 1), isChildParam, isNestedChildParam
+                newPathLen, isChildParam, isNestedChildParam
             ));
         }
 
-        // Create a switch
+        // Create a switch for multiple items
         else {
             builder.push(`switch(${ctx.urlName}.charCodeAt(${pathLen})){`);
 
             do {
-                // Handle case statement stuff
+                // Create a case statement for each char code
                 builder.push(`case ${it.value}:`);
-
                 builder.push(...f(
                     node.inert.get(it.value)!, ctx,
-                    plus(pathLen, 1), isChildParam, isNestedChildParam
+                    newPathLen, isChildParam, isNestedChildParam
                 ));
-
                 builder.push('break;');
 
                 it = keys.next();
             } while (!it.done);
 
+            // Close bracket
             builder.push('}');
         }
     }
@@ -99,7 +100,7 @@ const f = <T>(
                 ctx.hasPath ? '' : ',' + ctx.pathEndName
                 })`;
 
-            builder.push(methodCheck(
+            builder.push(storeCheck(
                 `${hasInert ? currentParamIndexName : nextSlashIndex}===-1`,
                 node.params.store!, ctx,
                 // Set params before return
@@ -136,14 +137,14 @@ const f = <T>(
     if (node.wildcardStore !== null) {
         const value = `${ctx.urlName}.${ctx.substrStrategy}(${pathLen})`;
 
-        // Wildcard parameter
+        // Assign wildcard parameter
         builder.push(ctx.paramsName);
-        builder.push(isChildParam ? `['*']=${value};` : `={'*':${value}};`)
-        builder.push(methodCheck(null, node.wildcardStore, ctx, null));
+        builder.push(isChildParam ? `['${ctx.wildcardName}']=${value};` : `={'${ctx.wildcardName}':${value}};`)
+        builder.push(storeCheck(null, node.wildcardStore, ctx, null));
     }
 
     // Root does not include a check
-    if (!isRoot) builder.push('}');
+    if (isNotRoot) builder.push('}');
 
     return builder;
 };

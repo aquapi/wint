@@ -2,11 +2,11 @@ import { Node } from "../../tree";
 import { BuildContext, } from "../../types";
 import plus from "./plus";
 
-export default <T>(
+export default (
     ctx: BuildContext,
-    node: Node<T>,
+    node: Node<any>,
     prevPathLen: string, pathLen: string
-) => {
+): string => {
     // Faster than doing substring
     if (node.part.length < 15) {
         const result = [];

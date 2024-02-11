@@ -1,13 +1,13 @@
 import { BuildContext } from '../../types';
 import insertStore from './insertStore';
 
-export default <T>(
+export default (
     // res is the condition
-    res: string | null, handler: T,
+    condition: string | null, handler: any,
     ctx: BuildContext,
     preReturn: string | null,
-) => // 
-    (res === null ? '' : 'if(' + res + ')')
+): string => // 
+    (condition === null ? '' : 'if(' + condition + ')')
     + (preReturn === null ? '' : '{' + preReturn)
     + `return ${insertStore(ctx, handler)}${ctx.caller}`
     + (preReturn === null ? '' : '}') + ';';

@@ -23,10 +23,12 @@ class Wint<T> {
         this.radix = new Radix(options);
     }
 
+    put(method: 'ALL', path: string, handler: T): this;
+
     /**
     * Register a route
     */
-    put(method: string, path: string, handler: T) {
+    put(method: string, path: string, handler: T): this {
         const h = this.radix.tree.store(path, { ALL: null });
         h[method] = handler;
 
@@ -36,10 +38,9 @@ class Wint<T> {
     /**
      * Build the router find function
      */
-    build() {
+    build(): this {
         const find = this.radix.build().find;
 
-        // Plain radix tree match is faster in this case
         this.find = c => {
             const t = find(c);
             return t === null ? null : (t[c.method] ?? t.ALL);

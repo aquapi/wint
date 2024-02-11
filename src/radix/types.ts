@@ -88,6 +88,11 @@ export interface BuildContext {
     readonly fallback: string;
 
     /**
+     * Wildcard parameter name
+     */
+    readonly wildcardName: string;
+
+    /**
      * The current ID of the store
      */
     currentID: number;
@@ -104,13 +109,11 @@ export type SubstrStrategy = 'substring' | 'slice';
 export interface Options<T = any> {
     substr?: SubstrStrategy;
     contextName?: string;
+    wildcardName?: string;
     /**
      * Whether to match using c.path or c.url
      */
     matchPath?: boolean;
-    /**
-     * Index of
-     */
     minURLLen?: number;
     directCall?: boolean;
     fallback?: T | null;

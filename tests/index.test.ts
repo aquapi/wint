@@ -3,9 +3,9 @@ import Wint from '..';
 import { test, expect } from 'bun:test';
 import register from './register';
 
-const router = register(new Wint<string>);
-
 test('Basic router', () => {
+    const router = register(new Wint<string>);
+
     // Root path matching
     expect(router.find({
         method: 'GET',

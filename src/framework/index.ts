@@ -1,14 +1,14 @@
 import { Options } from '../radix/types';
 import Wint, { Matchers } from '../turbo';
-import { Context } from './types';
+import { Context, wildcard } from './types';
 
 const req = 'req', pathStart = '_pathStart', pathEnd = '_pathEnd', ctx = 'c';
 
 /**
- * Stric-specific API
+ * framework-specific API
  */
-export const contextMacro = (options: Options) => `let ${pathStart}=${req}.url.indexOf('/',${options.minURLLen ?? 12})+1,`
-    + `${pathEnd}=${req}.url.indexOf('?',${pathStart});`
+export const contextMacro = (options: Options) => `const ${pathStart}=${req}.url.indexOf('/',${options.minURLLen ?? 12})+1;`
+    + `let ${pathEnd}=${req}.url.indexOf('?',${pathStart});`
     + `if(${pathEnd}===-1)${pathEnd}=${req}.url.length;`
     + `const ${ctx}={${req},${pathStart},${pathEnd},path:${req}.url.substring(${pathStart},${pathEnd}),headers:{}};`;
 
@@ -20,6 +20,8 @@ class FastWint extends Wint<(c: Context) => any> {
         super();
         this.radixOptions.directCall = true;
         this.radixOptions.fallback = () => null;
+        this.radixOptions.contextName = ctx;
+        this.radixOptions.wildcardName = wildcard;
     }
 
     buildFinder(matchers: Matchers<(c: Context) => any>): void {

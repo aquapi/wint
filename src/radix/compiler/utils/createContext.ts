@@ -8,6 +8,7 @@ export default (options: Options): BuildContext => {
     options.matchPath ??= false;
     options.minURLLen ??= 12;
     options.directCall ??= false;
+    options.wildcardName ??= '*';
 
     const caller = options.directCall ? `(${options.contextName})` : '';
 
@@ -30,6 +31,7 @@ export default (options: Options): BuildContext => {
 
         fallback: options.fallback ? fallback + caller : 'null',
 
-        hasPath: options.matchPath
+        hasPath: options.matchPath,
+        wildcardName: options.wildcardName
     }
 };

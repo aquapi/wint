@@ -16,7 +16,7 @@ export class Radix<T> {
     /**
      * Register routes
      */
-    routes(routes: Route<T>[]) {
+    routes(routes: Route<T>[]): this {
         for (const route of routes)
             this.tree.store(route[0], route[1]);
 
@@ -26,7 +26,7 @@ export class Radix<T> {
     /**
      * Register a route
      */
-    put(route: Route<T>) {
+    put(route: Route<T>): this {
         this.tree.store(route[0], route[1]);
 
         return this;
@@ -35,14 +35,14 @@ export class Radix<T> {
     /**
      * Create and register routes
      */
-    static create<T>(routes: Route<T>[]) {
+    static create<T>(routes: Route<T>[]): Radix<T> {
         return new this<T>().routes(routes);
     }
 
     /**
      * Build a find function
      */
-    build() {
+    build(): this {
         this.find = compile(this.tree, this.options);
         return this;
     }

@@ -3,13 +3,13 @@ import Wint from '../lib/turbo';
 import { test, expect } from 'bun:test';
 import register from './register';
 
-const wint = new Wint<string>().fallback('E');
-wint.radixOptions.minURLLen = 0;
-
-const router = register(wint);
-console.log(router.find.toString())
-
 test('Turbo router', () => {
+    const wint = new Wint<string>().fallback('E');
+    wint.radixOptions.minURLLen = 0;
+
+    const router = register(wint);
+    console.log(router.find.toString());
+
     // Root path matching
     expect(router.find({
         method: 'GET',

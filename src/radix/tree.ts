@@ -1,8 +1,3 @@
-export interface FindResult<T> {
-    store: T
-    params: Record<string, any>
-}
-
 export interface ParamNode<T> {
     paramName: string
     store: T | null
@@ -17,20 +12,14 @@ export interface Node<T> {
     wildcardStore: T | null
 }
 
-const
-    buildInertMap = (inert: Node<any>[]) => {
-        const map = new Map;
-
-        for (let i = 0, { length } = inert; i < length; ++i)
-            map.set(inert[i].part.charCodeAt(0), inert[i]);
-
-        return map;
-    },
-    // Object.assign(node, createNode(...))
-    assignNode = (node: Node<any>, part: string, inert: Node<any>[]) => {
+const    // Object.assign(node, createNode(...))
+    assignNode = (node: Node<any>, part: string) => {
         node.part = part;
-        node.inert = buildInertMap(inert);
+        node.inert = new Map();
         node.store = node.params = node.wildcardStore = null;
+    },
+    setChild = (node: Node<any>, child: Node<any>) => {
+        node.inert!.set(child.part.charCodeAt(0), child);
     },
     createNode = (part: string): Node<any> => ({
         part,
@@ -58,10 +47,11 @@ const
 export class Tree<T> {
     root: Node<T> = createNode('/');
 
-    store(path: string, store: T): FindResult<T>['store'] {
+    store(path: string, store: T): T {
         // Path should start with '/'
         if (path.charCodeAt(0) !== 47) path = '/' + path;
 
+        // Ends with '*'
         const isWildcard = path.charCodeAt(path.length - 1) === 42;
         if (isWildcard) path = path.slice(0, -1);
 
@@ -69,7 +59,6 @@ export class Tree<T> {
             paramParts = path.match(paramsRegex) ?? [];
 
         if (inertParts[inertParts.length - 1].length === 0) inertParts.pop();
-
         let node = this.root, paramPartsIndex = 0;
 
         for (let i = 0, { length } = inertParts; i < length; ++i) {
@@ -101,11 +90,11 @@ export class Tree<T> {
 
             for (let j = 0; ;) {
                 if (j === part.length) {
-                    if (j < node.part.length)
+                    if (j < node.part.length) {
                         // Move the current node down
-                        assignNode(node, part, [
-                            cloneNode(node, node.part.slice(j))
-                        ]);
+                        assignNode(node, part);
+                        setChild(node, cloneNode(node, node.part.slice(j)));
+                    }
 
                     break;
                 }
@@ -113,7 +102,6 @@ export class Tree<T> {
                 if (j === node.part.length) {
                     // Add static child
                     if (node.inert === null) node.inert = new Map();
-
                     else if (node.inert.has(part.charCodeAt(j))) {
                         // Re-run loop with existing static node
                         node = node.inert.get(part.charCodeAt(j))!;
@@ -134,10 +122,9 @@ export class Tree<T> {
                     // Split the node
                     const newChild = createNode(part.slice(j));
 
-                    assignNode(node, node.part.slice(0, j), [
-                        cloneNode(node, node.part.slice(j)),
-                        newChild
-                    ]);
+                    assignNode(node, node.part.slice(0, j));
+                    setChild(node, cloneNode(node, node.part.slice(j)));
+                    setChild(node, newChild);
 
                     node = newChild;
                     break;

@@ -5,7 +5,7 @@ const router = new FastWint;
 
 router
     .put('GET', '/', () => new Response('Hi'))
-    .put('GET', '/id/:id', c => new Response(c.params.id))
+    .put('GET', '/id/:id', ctx => new Response(ctx.params.id))
     .build();
 
 Bun.serve({
